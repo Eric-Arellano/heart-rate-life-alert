@@ -16,6 +16,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var locManager = CLLocationManager()
     let healthStore = HKHealthStore()
     var location = CLLocation()
+    var timer = Timer()
+    var counter = 0
     
     @IBAction func hourSlider(_ sender: UISlider) {
         sliderLabel.text = String(format: "%.2f", sender.value)
@@ -27,6 +29,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     //Called with every press of main button
     @IBAction func shootUp(_ sender: UIButton) {
         
+        //Create Timer
+        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+    }
+    
+    override func viewDidLoad() {
+        //Set up necessary location manager handling
+        super.viewDidLoad()
+        locManager.delegate = self
+        locManager.desiredAccuracy = kCLLocationAccuracyBest
+        locManager.requestWhenInUseAuthorization()
+        locManager.startUpdatingLocation()
+        locManager.requestAlwaysAuthorization()
+        sendLatLongRequest()
+    }
+    
+    func timerAction(){
         //Get heart rate, post to Python Server
         let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
         var csvString = ""
@@ -44,23 +62,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     for quantitySample in results {
                         let quantity = (quantitySample as! HKQuantitySample).quantity
                         let heartRateUnit = HKUnit(from: "count/min")
-                        csvString = "\(timeFormatter.string(from: quantitySample.startDate)), \(dateFormatter.string(from: quantitySample.startDate)), \(quantity.doubleValue(for: heartRateUnit))\n"
-                        self.makeRequest(message: csvString)
+                        csvString = "{ time: \(timeFormatter.string(from: quantitySample.startDate)), date: \(dateFormatter.string(from: quantitySample.startDate)), heart_rate: \(quantity.doubleValue(for: heartRateUnit)) }"
+                        self.makeRequest(message: csvString, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
             })
         }
-    }
-    
-    override func viewDidLoad() {
-        //Set up necessary location manager handling
-        super.viewDidLoad()
-        locManager.delegate = self
-        locManager.desiredAccuracy = kCLLocationAccuracyBest
-        locManager.requestWhenInUseAuthorization()
-        locManager.startUpdatingLocation()
-        locManager.requestAlwaysAuthorization()
     }
     
     func sendLatLongRequest(){
@@ -72,7 +80,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let lat = lat2.stringValue
         
         //Make the actual request
-        makeRequest(message: (lat + ", " + long))
+        makeRequest(message: ("{ latitude: " + lat + ", longitude: " + long + " }"), suffix: "location")
     }
 
     override func didReceiveMemoryWarning() {
@@ -85,9 +93,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         location = locations[0]
     }
     
-    func makeRequest(message: String){
+    func makeRequest(message: String, suffix: String){
         //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/location")!)
+        var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/"+suffix)!)
         request.httpMethod = "POST"
         let postString = message
         request.httpBody = postString.data(using: .utf8)
@@ -108,8 +116,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             //Get response from server
             let responseString = String(data: data, encoding: .utf8)
             print("responseString = \(responseString)")
+            if(responseString=="overdose"){
+                self.processOverdose()
+            }
         }
         task.resume()
+    }
+    
+    func processOverdose(){
+        timer.invalidate()
     }
 }
 
