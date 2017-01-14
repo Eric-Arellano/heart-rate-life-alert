@@ -1,6 +1,7 @@
+import json
+
 from flask import Flask
 from flask import request
-
 
 app = Flask(__name__)
 
@@ -12,26 +13,28 @@ def start_session():
 
 @app.route('/location', methods=['GET', 'POST'])
 def get_location():
-    connection = request.form
-    data = connection.json()
-    latitude = data[0]
-    longitude = data[1]
+    raw = request.form
+    parsed = json.loads(raw)
+    latitude = parsed['latitude']
+    longitude = parsed['longitude']
     return str(latitude) + ", " + str(longitude)
 
 
 @app.route('/hr', methods=['GET', 'POST'])
 def get_hr():
-    connection = request.form
-    data = connection.json()
-    heart_rate = data[3]
+    raw = request.form
+    parsed = json.loads(raw)
+    heart_rate = parsed['heart_rate']
     return heart_rate
     # TODO: for now, ignoring date/time value
 
 
 @app.route('/contact-number', methods=['GET', 'POST'])
 def get_contact_number():
-    content = request.form
-    return "+19258585614"
+    raw = request.form
+    parsed = json.loads(raw)
+    contact_number = parsed['contact_number']
+    return contact_number
 
 
 @app.route('/overdose', methods=['GET', 'POST'])
