@@ -53,6 +53,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                         let quantity = (quantitySample as! HKQuantitySample).quantity
                         let heartRateUnit = HKUnit(from: "count/min")
                         csvString = "\(timeFormatter.string(from: quantitySample.startDate)), \(dateFormatter.string(from: quantitySample.startDate)), \(quantity.doubleValue(for: heartRateUnit))\n"
+                        print(csvString)
+                        //print("\(timeFormatter.string(from: quantitySample.startDate)),\(dateFormatter.string(from: quantitySample.startDate)),\(quantity.doubleValue(for: heartRateUnit))")
+
                         self.makeRequest(message: csvString)
                     }
                 })
@@ -60,6 +63,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             })
  
         }
+        makeRequest(message: "test")
         
     }
     override func viewDidLoad() {
@@ -80,7 +84,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func makeRequest(message: String){
-        var request = URLRequest(url: URL(string: "http://172.20.10.4:5000/location")!)
+        var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/location")!)
         request.httpMethod = "POST"
         let postString = message
         print(postString)
