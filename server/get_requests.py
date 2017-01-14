@@ -1,7 +1,6 @@
-import json
-
 from flask import Flask
 from flask import request
+from simplejson import json
 
 app = Flask(__name__)
 
@@ -13,7 +12,7 @@ def start_session():
 
 @app.route('/location', methods=['GET', 'POST'])
 def get_location():
-    raw = request.form
+    raw = request.data
     parsed = json.loads(raw)
     latitude = parsed['latitude']
     longitude = parsed['longitude']
@@ -22,7 +21,7 @@ def get_location():
 
 @app.route('/hr', methods=['GET', 'POST'])
 def get_hr():
-    raw = request.form
+    raw = request.data
     parsed = json.loads(raw)
     heart_rate = parsed['heart_rate']
     return heart_rate
@@ -31,7 +30,7 @@ def get_hr():
 
 @app.route('/contact-number', methods=['GET', 'POST'])
 def get_contact_number():
-    raw = request.form
+    raw = request.data
     parsed = json.loads(raw)
     contact_number = parsed['contact_number']
     return contact_number
