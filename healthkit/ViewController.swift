@@ -25,31 +25,31 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func shootUp(_ sender: UIButton) {
         mainLabel.text = "Test"
-        let currentLocation = locManager.location
-        let long2 = NSNumber(value: currentLocation!.coordinate.longitude)
-        let lat2 = NSNumber(value: currentLocation!.coordinate.latitude)
-        let long = long2.stringValue
-        let lat = lat2.stringValue
-        mainLabel.text = long
-        var request = URLRequest(url: URL(string: "http://172.20.10.4:5000/location")!)
-        request.httpMethod = "POST"
-        let postString = lat + ", " + long
-        request.httpBody = postString.data(using: .utf8)
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {                                                 // check for fundamental networking error
-                print("error=\(error)")
-                return
-            }
-            
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-            }
-            
-            let responseString = String(data: data, encoding: .utf8)
-            print("responseString = \(responseString)")
-        }
-        task.resume()
+//        let currentLocation = locManager.location
+//        let long2 = NSNumber(value: currentLocation!.coordinate.longitude)
+//        let lat2 = NSNumber(value: currentLocation!.coordinate.latitude)
+//        let long = long2.stringValue
+//        let lat = lat2.stringValue
+//        mainLabel.text = long
+//        var request = URLRequest(url: URL(string: "http://172.20.10.4:5000/location")!)
+//        request.httpMethod = "POST"
+//        let postString = lat + ", " + long
+//        request.httpBody = postString.data(using: .utf8)
+//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+//            guard let data = data, error == nil else {                                                 // check for fundamental networking error
+//                print("error=\(error)")
+//                return
+//            }
+//            
+//            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+//                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+//                print("response = \(response)")
+//            }
+//            
+//            let responseString = String(data: data, encoding: .utf8)
+//            print("responseString = \(responseString)")
+//        }
+//        task.resume()
         
         let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
         
@@ -87,9 +87,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 })
                 self.healthStore.execute(query)
             })
+ 
         }
-
-        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
             }
@@ -98,8 +98,4 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
-
 }
-
