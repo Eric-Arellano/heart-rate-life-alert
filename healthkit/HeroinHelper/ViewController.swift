@@ -15,6 +15,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     var locManager = CLLocationManager()
     let healthStore = HKHealthStore()
+    var location = CLLocation()
     
     @IBAction func hourSlider(_ sender: UISlider) {
         sliderLabel.text = String(format: "%.2f", sender.value)
@@ -25,31 +26,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func shootUp(_ sender: UIButton) {
         mainLabel.text = "Test"
-//        let currentLocation = locManager.location
-//        let long2 = NSNumber(value: currentLocation!.coordinate.longitude)
-//        let lat2 = NSNumber(value: currentLocation!.coordinate.latitude)
-//        let long = long2.stringValue
-//        let lat = lat2.stringValue
-//        mainLabel.text = long
-//        var request = URLRequest(url: URL(string: "http://172.20.10.4:5000/location")!)
-//        request.httpMethod = "POST"
-//        let postString = lat + ", " + long
-//        request.httpBody = postString.data(using: .utf8)
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            guard let data = data, error == nil else {                                                 // check for fundamental networking error
-//                print("error=\(error)")
-//                return
-//            }
-//            
-//            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-//                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-//                print("response = \(response)")
-//            }
-//            
-//            let responseString = String(data: data, encoding: .utf8)
-//            print("responseString = \(responseString)")
-//        }
-//        task.resume()
+        locManager.requestAlwaysAuthorization()
+        let currentLocation = locManager.location
+        let long2 = NSNumber(value: currentLocation!.coordinate.longitude)
+        let lat2 = NSNumber(value: currentLocation!.coordinate.latitude)
+        let long = long2.stringValue
+        let lat = lat2.stringValue
+        mainLabel.text = long
+        var request = URLRequest(url: URL(string: "http://172.20.10.4:5000/location")!)
+        request.httpMethod = "POST"
+        let postString = lat + ", " + long
+        request.httpBody = postString.data(using: .utf8)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {                                                 // check for fundamental networking error
+                print("error=\(error)")
+                return
+            }
+            
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("response = \(response)")
+            }
+            
+            let responseString = String(data: data, encoding: .utf8)
+            print("responseString = \(responseString)")
+        }
+        task.resume()
         
         let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
         
@@ -92,14 +94,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-            }
+        locManager.delegate = self
+        locManager.desiredAccuracy = kCLLocationAccuracyBest
+        locManager.requestWhenInUseAuthorization()
+        locManager.startUpdatingLocation()
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        location = locations[0]
+    }
 
 }
 
