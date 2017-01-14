@@ -26,13 +26,25 @@
                                 <rect key="frame" x="44" y="155" width="343" height="647"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Heroin Helper at HackAZ" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zeI-yn-sd7">
-                                        <rect key="frame" x="28" y="0.0" width="287" height="162"/>
+                                        <rect key="frame" x="28" y="0.0" width="287" height="81"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Emergency Contact Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="68T-pA-T16">
+                                        <rect key="frame" x="0.0" y="81" width="343" height="81"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Emergency Contact Number" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bix-Zf-7h6">
+                                        <rect key="frame" x="0.0" y="162" width="343" height="80.5"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b6l-av-ec0">
-                                        <rect key="frame" x="40.5" y="162" width="262" height="161.5"/>
+                                        <rect key="frame" x="40.5" y="242.5" width="262" height="81"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="64"/>
                                         <state key="normal" title="Shoot Up"/>
                                         <connections>
@@ -40,30 +52,38 @@
                                         </connections>
                                     </button>
                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.5" maxValue="7" translatesAutoresizingMaskIntoConstraints="NO" id="Fyy-Yu-CYn">
-                                        <rect key="frame" x="-2" y="323.5" width="347" height="163"/>
+                                        <rect key="frame" x="-2" y="323.5" width="347" height="82"/>
                                         <connections>
                                             <action selector="hourSlider:" destination="BYZ-38-t0r" eventType="valueChanged" id="xw6-fy-tJu"/>
                                         </connections>
                                     </slider>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=".5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IWg-R4-gne">
-                                        <rect key="frame" x="164.5" y="485.5" width="14.5" height="161.5"/>
+                                        <rect key="frame" x="164.5" y="404.5" width="14.5" height="81"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="baF-89-mCa">
+                                        <rect key="frame" x="147" y="485.5" width="51" height="80.5"/>
+                                    </switch>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Call/Text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Yc-zb-08A">
+                                        <rect key="frame" x="0.0" y="566" width="343" height="81"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="48"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="bix-Zf-7h6" secondAttribute="trailing" id="59i-5o-swW"/>
+                                    <constraint firstItem="bix-Zf-7h6" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="8gu-fF-Iqf"/>
+                                    <constraint firstItem="68T-pA-T16" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="ADu-Kc-Gex"/>
+                                    <constraint firstItem="8Yc-zb-08A" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="HYK-Aa-dmL"/>
+                                    <constraint firstAttribute="trailing" secondItem="68T-pA-T16" secondAttribute="trailing" id="TrE-xu-MxN"/>
+                                    <constraint firstAttribute="trailing" secondItem="8Yc-zb-08A" secondAttribute="trailing" id="b20-lV-zrl"/>
                                     <constraint firstItem="Fyy-Yu-CYn" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="eML-Xg-bim"/>
                                     <constraint firstAttribute="trailing" secondItem="Fyy-Yu-CYn" secondAttribute="trailing" id="rSX-Wl-VbI"/>
                                 </constraints>
                             </stackView>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Emergency Contact Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="68T-pA-T16">
-                                <rect key="frame" x="78" y="28" width="97" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
