@@ -1,5 +1,6 @@
-from twilio.rest import TwilioRestClient
 import os  # for API Keys
+
+from twilio.rest import TwilioRestClient
 
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -32,7 +33,7 @@ def get_to_number():
 
 
 def get_message():
-    return "It workssssss"
+    return "WARNING: your friend has overdosed. Please respond immediately."
 
 
 trigger_response()

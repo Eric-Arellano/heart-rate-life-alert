@@ -5,26 +5,19 @@ from flask import request
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
-
-def accept_location():
-    accept_request('location')
-
-
-def accept_hr():
-    accept_request('hr')
-
-
-def accept_friend_info():
-    accept_request('friend-info')
-
-
-@app.route('/get/<string:address>', methods=['GET', 'POST'])
-def accept_request(address):
+@app.route('/location', methods=['GET', 'POST'])
+def get_location():
     content = request.form
-    print content
-    print content.split()
-    return 'hi'
+    return "18.231, 38.13813"
+
+
+@app.route('/hr', methods=['GET', 'POST'])
+def get_hr():
+    content = request.form
+    return 100
+
+
+@app.route('/contact-number', methods=['GET', 'POST'])
+def get_contact_number():
+    content = request.form
+    return "+19258585614"
