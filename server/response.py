@@ -7,21 +7,24 @@ client = TwilioRestClient(account_sid, auth_token)
 
 
 def trigger_response():
-    from_number = get_from_number()
+    # get values
     to_number = get_to_number()
+    from_number = get_from_number()
     message = get_message()
-    send_text(message, to_number, from_number)
+
+    # send text
+    send_text(to_number, from_number, message)
 
 
-def send_text(from_, to, message):
-    message = client.messages.create(body=message,
-                                     to=to,
-                                     from_=from_)
+def send_text(to, from_, message):
+    message = client.messages.create(to=to,
+                                     from_=from_,
+                                     body=message)
     print(message.sid)
 
 
 def get_from_number():
-    return "+15203917018"
+    return "+15202144342"
 
 
 def get_to_number():
@@ -29,6 +32,7 @@ def get_to_number():
 
 
 def get_message():
-    return "SOS I NEED HELP ABHIK"
+    return "It workssssss"
+
 
 trigger_response()
