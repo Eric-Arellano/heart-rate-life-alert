@@ -1,19 +1,21 @@
 from get_requests import get_hr, get_location, get_contact_number
 from interpreter import is_overdose
-from response import trigger_response
+from response import Response
 
 # wait till app starts w/ GPS and friend data
 
 # initialize with GPS and friend data
 location = get_location()
 contact_number = get_contact_number()
-# Response response = new Response(location, contact_number)
+response = Response(location, contact_number)
 
 # continuously check and interpret HR
 while True:
     heart_rate = get_hr()
     if is_overdose(heart_rate):
-        trigger_response
+        response.trigger_response()
+    else:
+        pass
 
 # TODO: migrate to session-based design, server should run continuously
 # Session has its own HR list and Response object with location and contact info
