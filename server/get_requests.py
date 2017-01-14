@@ -9,18 +9,18 @@ def hello_world():
 
 
 def accept_location():
-    accept_request('/location')
+    accept_request('location')
 
 
 def accept_hr():
-    accept_request('/hr')
+    accept_request('hr')
 
 
 def accept_friend_info():
-    accept_request('/friend-info')
+    accept_request('friend-info')
 
 
-@app.route('<string:address>', methods=['GET', 'POST'])
+@app.route('/get/<string:address>', methods=['GET', 'POST'])
 def accept_request(address):
     content = request.form
     print content
