@@ -18,6 +18,8 @@
 	<string>1.0</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>get location for tracking</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>get location for tracking</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
