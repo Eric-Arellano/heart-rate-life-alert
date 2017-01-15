@@ -18,31 +18,19 @@ def start_session():
 
 @app.route('/location', methods=['GET', 'POST'])
 def get_location():
-    # get data
-    raw = request.form
-    for jsonString in raw:
-        js = jsonString
-        print jsonString
-    parsed = json.loads(js)
+    parsed = extract_json(request.form)
     latitude = parsed['latitude']
     longitude = parsed['longitude']
-    # return
     response.location = str(latitude) + "," + str(longitude)
     return "Location received."
 
 
 @app.route('/hr', methods=['GET', 'POST'])
 def get_hr():
-    # get data
-    raw = request.form
-    for jsonString in raw:
-        js = jsonString
-        print jsonString
-    parsed = json.loads(js)
+    parsed = extract_json(request.form)
     heart_rate = parsed['heart_rate']
-    date = parsed['date']
-    time = parsed['time']
-    # return
+    # date = parsed['date']
+    # time = parsed['time']
     heart_rates.append(heart_rate)
     if is_overdose(heart_rate):
         response.trigger_response()
@@ -52,11 +40,7 @@ def get_hr():
 
 @app.route('/contact-info', methods=['GET', 'POST'])
 def get_contact_number():
-    raw = request.form
-    for jsonString in raw:
-        js = jsonString
-        print jsonString
-    parsed = json.loads(js)
+    parsed = extract_json(request.form)
     response.contact_number = "+1" + parsed['contact_number']
     response.contact_name = parsed['contact_name']
     response.contact_preference = parsed['contact_preference']
@@ -66,11 +50,7 @@ def get_contact_number():
 
 @app.route('/fake-kill', methods=['GET', 'POST'])
 def fake_kill():
-    raw = request.form
-    for jsonString in raw:
-        js = jsonString
-        print jsonString
-    parsed = json.loads(js)
+    parsed = extract_json(request.form)
     heart_rate = parsed['heart_rate']
     if is_fake_kill(heart_rate):
         response.trigger_response()
@@ -81,6 +61,13 @@ def fake_kill():
 @app.route('/stop-app', methods=['GET', 'POST'])
 def stop_app():
     pass
+
+
+def extract_json(request_form):
+    for jsonString in request_form:
+        js = jsonString
+        print jsonString
+    return json.loads(js)
 
 
 if __name__ == "__main__":
