@@ -170,9 +170,33 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
             let responseString = String(data: data, encoding: .utf8)
             print("responseString = \(responseString!)")
-            
+            if(responseString=="Overdose." || responseString=="Fake kill."){
+                self.alertUserAboutImpendingText()
+            }
         }
         task.resume()
+    }
+    
+    func alertUserAboutImpendingText(){
+//        let alert = UIAlertController(title: "Are you ok?", message: "We will alert " + emergencyName.text! + " in thirty seconds if you do not press \"I am ok\"", preferredStyle: UIAlertControllerStyle.alert)
+//        let okAction = UIAlertAction(title: "I am ok.", style: .default) { (_) -> Void in
+//        }
+//        alert.addAction(okAction)
+//        present(alert, animated: true, completion: nil)
+
+        let alertController = UIAlertController(title: "Are you ok?", message:"We will alert " + emergencyName.text! + " in thirty seconds if you do not press \"I am ok\"", preferredStyle: .alert)
+        
+        alertController.addTextField { (textfield) -> Void in
+            textfield.placeholder = "Name"
+        }
+        
+        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) -> Void in
+            // Some action here
+        }
+        alertController.addAction(okAction)
+        
+        present(alertController, animated: true, completion: nil)
+        
     }
     
     func processOverdose(){
