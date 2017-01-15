@@ -47,7 +47,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func timerAction(){
         //Get heart rate, post to Python Server
         let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
-        var csvString = ""
+        var cvsDict: [String: Any] = [:]
         if (HKHealthStore.isHealthDataAvailable()){
             self.healthStore.requestAuthorization(toShare: nil, read:[heartRateType], completion:{(success, error) in
                 let sortByTime = NSSortDescriptor(key:HKSampleSortIdentifierEndDate, ascending:false)
@@ -61,9 +61,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     guard let results = results else { return }
                     for quantitySample in results {
                         let quantity = (quantitySample as! HKQuantitySample).quantity
+                        let time = timeFormatter.string(from: quantitySample.startDate)
+                        let date = dateFormatter.string(from: quantitySample.startDate)
                         let heartRateUnit = HKUnit(from: "count/min")
-                        csvString = "{ time: \(timeFormatter.string(from: quantitySample.startDate)), date: \(dateFormatter.string(from: quantitySample.startDate)), heart_rate: \(quantity.doubleValue(for: heartRateUnit)) }"
-                        self.makeRequest(message: csvString, suffix: "hr")
+                        let heartRate = quantity.doubleValue(for: heartRateUnit)
+                        cvsDict = ["time": time, "date": date, "heart_rate": heartRate]
+                        self.makeRequest(message: cvsDict, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
@@ -80,7 +83,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let lat = lat2.stringValue
         
         //Make the actual request
-        makeRequest(message: ("{ latitude: " + lat + ", longitude: " + long + " }"), suffix: "location")
+        let message: [String: Any] = ["latitude": lat, "longitude": long]
+        makeRequest(message: message, suffix: "location")
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,12 +97,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         location = locations[0]
     }
     
-    func makeRequest(message: String, suffix: String){
+    func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
         var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/"+suffix)!)
         request.httpMethod = "POST"
-        let postString = message
-        request.httpBody = postString.data(using: .utf8)
+        let postString = try? JSONSerialization.data(withJSONObject: message)
+        request.httpBody = postString
         
         //Run task that calls the actual POST
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
