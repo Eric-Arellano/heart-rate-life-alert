@@ -17,7 +17,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let healthStore = HKHealthStore()
     var location = CLLocation()
     var timer = Timer()
-    var counter = 0
+    var timer2 = Timer()
+    var inDanger = false
     
     @IBOutlet weak var contactPreference: UISwitch!
     @IBOutlet weak var emergencyName: UITextField!
@@ -25,6 +26,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var contactCause: UITextField!
     
     @IBOutlet weak var mainLabel: UILabel!
+    var count = 0
     
     //Called with every press of main button
     @IBAction func startMonitor(_ sender: UIButton) {
@@ -37,6 +39,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //Create Timer
         timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        
     }
     
     //
@@ -171,31 +174,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             let responseString = String(data: data, encoding: .utf8)
             print("responseString = \(responseString!)")
             if(responseString=="Overdose." || responseString=="Fake kill."){
-                self.alertUserAboutImpendingText()
+                self.inDanger = true
+                let alertController = UIAlertController(title: "Are you ok?", message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds", preferredStyle: .alert)
+                
+                alertController.addTextField { (textfield) -> Void in
+                    textfield.placeholder = "Name"
+                }
+                let action = UIAlertAction(title: "I am ok", style: .default, handler: self.markInDangerFalse)
+                alertController.addAction(action)
+                DispatchQueue.main.async {
+                    self.present(alertController, animated: true, completion: nil)
+                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(self.timer2Action), userInfo: nil, repeats: false)
+                }
+
+                
             }
         }
         task.resume()
     }
     
-    func alertUserAboutImpendingText(){
-//        let alert = UIAlertController(title: "Are you ok?", message: "We will alert " + emergencyName.text! + " in thirty seconds if you do not press \"I am ok\"", preferredStyle: UIAlertControllerStyle.alert)
-//        let okAction = UIAlertAction(title: "I am ok.", style: .default) { (_) -> Void in
-//        }
-//        alert.addAction(okAction)
-//        present(alert, animated: true, completion: nil)
-
-        let alertController = UIAlertController(title: "Are you ok?", message:"We will alert " + emergencyName.text! + " in thirty seconds if you do not press \"I am ok\"", preferredStyle: .alert)
-        
-        alertController.addTextField { (textfield) -> Void in
-            textfield.placeholder = "Name"
-        }
-        
-        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) -> Void in
-            // Some action here
-        }
-        alertController.addAction(okAction)
-        
-        present(alertController, animated: true, completion: nil)
+    func markInDangerFalse(alert: UIAlertAction!){
+        inDanger = false
+    }
+    
+    func timer2Action(){
+        let json: [String: Any] = ["master-kill": "master-kill"]
+        self.makeRequest(message: json, suffix: "master-kill")
         
     }
     
