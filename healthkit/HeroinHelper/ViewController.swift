@@ -27,9 +27,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var mainLabel: UILabel!
     var count = 0
+    var trackingEnabled = false
     
     //Called with every press of main button
     @IBAction func startMonitor(_ sender: UIButton) {
+        trackingEnabled = true
         //Post current filled out contact info
         postContact()
         //Post lat long coordinates
@@ -49,18 +51,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     @IBAction func stopMonitoring(_ sender: UIButton) {
-        //Stop updating of Heart Rate
-        timer.invalidate()
-        //Tell server to Stop
-        let json: [String: Any] = ["stop": "stop"]
-        makeRequest(message: json, suffix: "stop-app")
+        if(trackingEnabled==true){
+            //Stop updating of Heart Rate
+            timer.invalidate()
+            //Tell server to Stop
+            let json: [String: Any] = ["stop": "stop"]
+            makeRequest(message: json, suffix: "stop-app")
+        }else{
+            trackingEnabled = false
+        }
     }
     
     //For demonstration purposes, pretend HR is -1
     @IBAction func kill(_ sender: UIButton) {
-        //Send POST that server knows is a fake kill
-        let json: [String: Any] = ["heart_rate": "-1"]
-        makeRequest(message: json, suffix: "fake-kill")
+        if(trackingEnabled==true){
+            //Send POST that server knows is a fake kill
+            let json: [String: Any] = ["heart_rate": "-1"]
+            makeRequest(message: json, suffix: "fake-kill")
+        }else{
+            trackingEnabled = false
+        }
     }
     
     override func viewDidLoad() {
@@ -152,7 +162,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://172.20.10.6:5000/"+suffix)!)
+        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
         request.httpMethod = "POST"
         let postedJSON = try? JSONSerialization.data(withJSONObject: message)
         request.httpBody = postedJSON
@@ -177,9 +187,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 self.inDanger = true
                 let alertController = UIAlertController(title: "Are you ok?", message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds", preferredStyle: .alert)
                 
-                alertController.addTextField { (textfield) -> Void in
-                    textfield.placeholder = "Name"
-                }
                 let action = UIAlertAction(title: "I am ok", style: .default, handler: self.markInDangerFalse)
                 alertController.addAction(action)
                 DispatchQueue.main.async {
@@ -198,9 +205,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func timer2Action(){
-        let json: [String: Any] = ["master-kill": "master-kill"]
-        self.makeRequest(message: json, suffix: "master-kill")
-        
+        if(inDanger==true){
+            let json: [String: Any] = ["master-kill": "master-kill"]
+            self.makeRequest(message: json, suffix: "master-kill")
+        }
     }
     
     func processOverdose(){
