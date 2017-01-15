@@ -1,6 +1,6 @@
+import simplejson as json
 from flask import Flask
 from flask import request
-import simplejson as json
 
 from interpreter import is_overdose
 from response import Response
@@ -56,7 +56,7 @@ def warn_overdose():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
 
 # TODO: migrate to session-based design, server should run continuously
 # Session has its own HR list and Response object with location and contact info
