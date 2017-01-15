@@ -55,7 +55,6 @@ def get_hr():
     # time = parsed['time']
     heart_rates.append(heart_rate)
     if is_overdose(heart_rate):
-        response.trigger_response()
         return "Overdose."
     return "HR okay."
 
@@ -65,9 +64,14 @@ def fake_kill():
     parsed = extract_json(request.form)
     heart_rate = parsed['heart_rate']
     if is_fake_kill(heart_rate):
-        response.trigger_response()
         return "Fake kill."
     return "Fake kill not triggered."
+
+
+@app.route('/master-kill', methods=['GET', 'POST'])
+def master_kill():
+    response.trigger_response()
+    return "Master kill."
 
 
 @app.route('/twiml')

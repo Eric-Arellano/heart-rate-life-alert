@@ -46,7 +46,7 @@ class Response:
         elif self.contact_preference == 'call':
             twiml = self.generate_twiml(message)
             self.write_twiml_to_file(twiml, 'static/phone-script.xml')
-            script_url = '172.20.10.6/twiml'
+            script_url = 'http://172.56.17.26:8080/twiml'
             self.start_call(self.contact_number, self.from_number, script_url)
 
     @staticmethod
