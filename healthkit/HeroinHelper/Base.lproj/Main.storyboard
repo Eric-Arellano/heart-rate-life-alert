@@ -22,66 +22,70 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" axis="vertical" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Ugq-5v-WmV">
-                                <rect key="frame" x="44" y="155" width="343" height="647"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" axis="vertical" distribution="fillProportionally" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Ugq-5v-WmV">
+                                <rect key="frame" x="-57" y="0.0" width="343" height="647"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Heroin Helper at HackAZ" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zeI-yn-sd7">
-                                        <rect key="frame" x="28" y="0.0" width="287" height="81"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hi, Eric. I'm here to help." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zeI-yn-sd7">
+                                        <rect key="frame" x="32.5" y="0.0" width="278" height="62"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Emergency Contact Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="68T-pA-T16">
-                                        <rect key="frame" x="0.0" y="81" width="343" height="81"/>
+                                        <rect key="frame" x="0.0" y="62" width="343" height="59"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Emergency Contact Number" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bix-Zf-7h6">
-                                        <rect key="frame" x="0.0" y="162" width="343" height="80.5"/>
+                                        <rect key="frame" x="0.0" y="121" width="343" height="58.5"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b6l-av-ec0">
-                                        <rect key="frame" x="40.5" y="242.5" width="262" height="81"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="64"/>
-                                        <state key="normal" title="Shoot Up"/>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Reason for Using Heartner" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QpL-Yo-shn">
+                                        <rect key="frame" x="0.0" y="179.5" width="343" height="59"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nca-3Y-B3G">
+                                        <rect key="frame" x="0.0" y="238.5" width="343" height="124"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="42"/>
+                                        <state key="normal" title="Start Monitoring"/>
                                         <connections>
-                                            <action selector="shootUp:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kFi-mT-xeI"/>
+                                            <action selector="startMonitor:" destination="BYZ-38-t0r" eventType="touchUpInside" id="qJV-is-aTK"/>
                                         </connections>
                                     </button>
-                                    <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.5" maxValue="7" translatesAutoresizingMaskIntoConstraints="NO" id="Fyy-Yu-CYn">
-                                        <rect key="frame" x="-2" y="323.5" width="347" height="82"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8CO-fM-nTN">
+                                        <rect key="frame" x="24.5" y="362.5" width="294" height="123.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="42"/>
+                                        <state key="normal" title="Stop Monitoring"/>
                                         <connections>
-                                            <action selector="hourSlider:" destination="BYZ-38-t0r" eventType="valueChanged" id="xw6-fy-tJu"/>
+                                            <action selector="stopMonitoring:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g5F-fe-PoX"/>
                                         </connections>
-                                    </slider>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hours to Monitor For: .5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IWg-R4-gne">
-                                        <rect key="frame" x="80.5" y="404.5" width="182" height="81"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    </button>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="baF-89-mCa">
-                                        <rect key="frame" x="147" y="485.5" width="51" height="80.5"/>
+                                        <rect key="frame" x="147" y="486" width="51" height="61"/>
                                     </switch>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Call/Text" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Yc-zb-08A">
-                                        <rect key="frame" x="0.0" y="566" width="343" height="81"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="48"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xMO-xc-jt6">
+                                        <rect key="frame" x="140.5" y="547" width="62" height="100"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="32"/>
+                                        <state key="normal" title="KILL"/>
+                                        <connections>
+                                            <action selector="kill:" destination="BYZ-38-t0r" eventType="touchUpInside" id="RYb-iE-IEf"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="QpL-Yo-shn" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="0O1-jH-cmx"/>
                                     <constraint firstAttribute="trailing" secondItem="bix-Zf-7h6" secondAttribute="trailing" id="59i-5o-swW"/>
                                     <constraint firstItem="bix-Zf-7h6" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="8gu-fF-Iqf"/>
                                     <constraint firstItem="68T-pA-T16" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="ADu-Kc-Gex"/>
-                                    <constraint firstItem="8Yc-zb-08A" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="HYK-Aa-dmL"/>
+                                    <constraint firstAttribute="trailing" secondItem="QpL-Yo-shn" secondAttribute="trailing" id="JWW-qA-2SD"/>
                                     <constraint firstAttribute="trailing" secondItem="68T-pA-T16" secondAttribute="trailing" id="TrE-xu-MxN"/>
-                                    <constraint firstAttribute="trailing" secondItem="8Yc-zb-08A" secondAttribute="trailing" id="b20-lV-zrl"/>
-                                    <constraint firstItem="Fyy-Yu-CYn" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="eML-Xg-bim"/>
-                                    <constraint firstAttribute="trailing" secondItem="Fyy-Yu-CYn" secondAttribute="trailing" id="rSX-Wl-VbI"/>
+                                    <constraint firstItem="Nca-3Y-B3G" firstAttribute="leading" secondItem="Ugq-5v-WmV" secondAttribute="leading" id="Uig-vP-WIu"/>
+                                    <constraint firstAttribute="trailing" secondItem="Nca-3Y-B3G" secondAttribute="trailing" id="rEI-Sl-Ubc"/>
                                 </constraints>
                             </stackView>
                         </subviews>
@@ -94,11 +98,11 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="contactCause" destination="QpL-Yo-shn" id="KnP-iQ-QQU"/>
                         <outlet property="contactPreference" destination="baF-89-mCa" id="y49-gm-ljI"/>
                         <outlet property="emergencyName" destination="68T-pA-T16" id="xlv-hu-b6K"/>
                         <outlet property="emergencyNumber" destination="bix-Zf-7h6" id="9j9-Rf-Hfd"/>
                         <outlet property="mainLabel" destination="zeI-yn-sd7" id="I0o-Wl-Uir"/>
-                        <outlet property="sliderLabel" destination="IWg-R4-gne" id="f3g-Ta-wVy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

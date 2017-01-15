@@ -22,16 +22,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var contactPreference: UISwitch!
     @IBOutlet weak var emergencyName: UITextField!
     @IBOutlet weak var emergencyNumber: UITextField!
-    @IBAction func hourSlider(_ sender: UISlider) {
-        sliderLabel.text = "Hours to Monitor For: " + String(format: "%.2f", sender.value)
-        mainLabel.text = emergencyNumber.text
-    }
+    @IBOutlet weak var contactCause: UITextField!
     
     @IBOutlet weak var mainLabel: UILabel!
-    @IBOutlet weak var sliderLabel: UILabel!
     
     //Called with every press of main button
-    @IBAction func shootUp(_ sender: UIButton) {
+    @IBAction func startMonitor(_ sender: UIButton) {
         //Post current filled out contact info
         postContact()
         //Post lat long coordinates
@@ -39,6 +35,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //Create Timer
         timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+    }
+    
+    @IBAction func stopMonitoring(_ sender: UIButton) {
+        //Stop updating of Heart Rate
+        timer.invalidate()
+        //Tell server to Stop
+        let json: [String: Any] = ["stop": "stop"]
+        makeRequest(message: json, suffix: "stop")
+    }
+    
+    @IBAction func kill(_ sender: UIButton) {
+        let json: [String: Any] = ["heart_rate": "1"]
+        makeRequest(message: json, suffix: "fake_kill")
     }
     
     override func viewDidLoad() {
@@ -49,7 +58,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         locManager.requestAlwaysAuthorization()
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissKeyboard))
+        //tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
     }
+
+    //Calls this function when the tap is recognized.
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
+    
     
     func timerAction(){
         //Get heart rate, post to Python Server
@@ -107,13 +126,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func postContact(){
         let name = emergencyName.text
         let number = emergencyNumber.text
+        let cause = contactCause.text
         var preference = ""
         if(contactPreference.isOn){
             preference = "text"
         }else{
             preference = "call"
         }
-        let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference]
+        let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
         makeRequest(message: json, suffix: "contact-info")
     }
 
