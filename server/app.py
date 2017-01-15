@@ -1,5 +1,5 @@
 import simplejson as json
-from flask import Flask
+from flask import Flask, current_app
 from flask import request
 
 from interpreter import is_overdose, is_fake_kill
@@ -9,6 +9,12 @@ app = Flask(__name__)
 
 heart_rates = []
 response = Response()
+
+
+# test call feature + translate latlong
+# print(translate_latlong_to_address('37.785834,-122.406417'))
+# response.contact_preference = 'call'
+# response.trigger_response()
 
 
 @app.route('/dashboard', methods=['GET'])
@@ -38,7 +44,7 @@ def get_contact_number():
 @app.route('/start-monitoring', methods=['GET', 'POST'])
 def start_monitoring():
     response.notify_contact_of_start()
-    return "Contact notified"
+    return "Contact notified."
 
 
 @app.route('/hr', methods=['GET', 'POST'])
@@ -62,6 +68,11 @@ def fake_kill():
         response.trigger_response()
         return "Fake kill."
     return "Fake kill not triggered."
+
+
+@app.route('/twiml')
+def get_twiml():
+    return current_app.send_static_file('phone-script.xml')
 
 
 @app.route('/stop-app', methods=['GET', 'POST'])

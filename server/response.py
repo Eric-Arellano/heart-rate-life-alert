@@ -1,5 +1,6 @@
 import os  # for API Keys
 
+from twilio import twiml
 from twilio.rest import TwilioRestClient
 
 from map import create_map_url
@@ -43,7 +44,9 @@ class Response:
             map_url = create_map_url(self.location)
             self.send_text(self.contact_number, self.from_number, message, map_url)
         elif self.contact_preference == 'call':
-            script_url = None  # TODO: how to get phone script URL and use variables?
+            twiml = self.generate_twiml(message)
+            self.write_twiml_to_file(twiml, 'static/phone-script.xml')
+            script_url = '172.20.10.6/twiml'
             self.start_call(self.contact_number, self.from_number, script_url)
 
     @staticmethod
@@ -55,3 +58,15 @@ class Response:
     def start_call(to, from_, script_url):
         call = client.calls.create(to=to, from_=from_, url=script_url)
         print(call.sid)
+
+    @staticmethod
+    def generate_twiml(message):
+        response = twiml.Response()
+        response.say(message)
+        return str(response)
+
+    @staticmethod
+    def write_twiml_to_file(message, filename):
+        with open(filename, 'w') as file:
+            file.write(message)
+        file.close()
