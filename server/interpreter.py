@@ -1,4 +1,4 @@
-OVERDOSE_HEART_RATE = 80
+OVERDOSE_HEART_RATE = 60
 
 
 def is_overdose(heart_rate):
