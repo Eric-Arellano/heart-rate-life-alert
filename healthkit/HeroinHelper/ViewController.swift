@@ -19,8 +19,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var timer = Timer()
     var counter = 0
     
+    @IBOutlet weak var contactPreference: UISwitch!
+    @IBOutlet weak var emergencyName: UITextField!
+    @IBOutlet weak var emergencyNumber: UITextField!
     @IBAction func hourSlider(_ sender: UISlider) {
-        sliderLabel.text = String(format: "%.2f", sender.value)
+        sliderLabel.text = "Hours to Monitor For: " + String(format: "%.2f", sender.value)
+        mainLabel.text = emergencyNumber.text
     }
     
     @IBOutlet weak var mainLabel: UILabel!
@@ -28,8 +32,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     //Called with every press of main button
     @IBAction func shootUp(_ sender: UIButton) {
-        
+        //Post current filled out contact info
+        postContact()
+        //Post lat long coordinates
+        sendLatLongRequest()
         //Create Timer
+        timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
     }
     
@@ -41,7 +49,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         locManager.requestAlwaysAuthorization()
-        sendLatLongRequest()
     }
     
     func timerAction(){
@@ -83,8 +90,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let latitude = latitude_numeric.stringValue
         
         //Make the actual request
-        let message: [String: Any] = ["latitude": latitude, "longitude": longitude]
-        makeRequest(message: message, suffix: "location")
+        let json: [String: Any] = ["latitude": latitude, "longitude": longitude]
+        makeRequest(message: json, suffix: "location")
     }
 
     override func didReceiveMemoryWarning() {
@@ -97,31 +104,35 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         location = locations[0]
     }
     
+    func postContact(){
+        let name = emergencyName.text
+        let number = emergencyNumber.text
+        var preference = ""
+        if(contactPreference.isOn){
+            preference = "text"
+        }else{
+            preference = "call"
+        }
+        let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference]
+        makeRequest(message: json, suffix: "contact-info")
+    }
+
     func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/"+suffix)!)
+        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
         request.httpMethod = "POST"
         let postedJSON = try? JSONSerialization.data(withJSONObject: message)
         request.httpBody = postedJSON
         
         //Run task that calls the actual POST
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            //Handle networking errors
             guard let data = data, error == nil else {
-                print("error=\(error)")
+                print(error?.localizedDescription ?? "No data")
                 return
             }
-            
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-            }
-            
-            //Get response from server
-            let responseString = String(data: data, encoding: .utf8)
-            print("responseString = \(responseString)")
-            if(responseString=="overdose"){
-                self.processOverdose()
+            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+            if let responseJSON = responseJSON as? [String: Any] {
+                print(responseJSON)
             }
         }
         task.resume()
