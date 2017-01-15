@@ -12,7 +12,7 @@ response = Response()
 
 
 @app.route('/dashboard', methods=['GET'])
-def start_session():
+def return_heart_rates():
     return ", ".join(heart_rates)
 
 
@@ -23,6 +23,22 @@ def get_location():
     longitude = parsed['longitude']
     response.location = str(latitude) + "," + str(longitude)
     return "Location received."
+
+
+@app.route('/contact-info', methods=['GET', 'POST'])
+def get_contact_number():
+    parsed = extract_json(request.form)
+    response.contact_number = "+1" + parsed['contact_number']
+    response.contact_name = parsed['contact_name']
+    response.contact_preference = parsed['contact_preference']
+    response.cause = parsed['contact_cause']
+    return 'Contact preferences received.'
+
+
+@app.route('/start-monitoring', methods=['GET', 'POST'])
+def start_monitoring():
+    response.notify_contact_of_start()
+    return "Contact notified"
 
 
 @app.route('/hr', methods=['GET', 'POST'])
@@ -38,16 +54,6 @@ def get_hr():
     return "HR okay."
 
 
-@app.route('/contact-info', methods=['GET', 'POST'])
-def get_contact_number():
-    parsed = extract_json(request.form)
-    response.contact_number = "+1" + parsed['contact_number']
-    response.contact_name = parsed['contact_name']
-    response.contact_preference = parsed['contact_preference']
-    response.cause = parsed['contact_cause']
-    return 'Contact preferences received.'
-
-
 @app.route('/fake-kill', methods=['GET', 'POST'])
 def fake_kill():
     parsed = extract_json(request.form)
@@ -60,7 +66,7 @@ def fake_kill():
 
 @app.route('/stop-app', methods=['GET', 'POST'])
 def stop_app():
-    pass
+    return "Stop app."
 
 
 def extract_json(request_form):

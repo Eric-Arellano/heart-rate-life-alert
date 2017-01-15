@@ -36,7 +36,7 @@ class Response:
     def trigger_response(self):
         # TODO: convert lat long to address
         message = self.contact_name + ", your friend " + self.user_name + \
-                  " has reached a dangerous heart rate level. This may be: " \
+                  " has reached a dangerous heart rate level. This may be due to: " \
                   + self.cause + ".\nThey are located at " + self.location \
                   + ". Please respond immediately and consider calling 911."
         map_url = create_map_url(self.location)
