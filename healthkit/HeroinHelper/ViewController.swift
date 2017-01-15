@@ -97,7 +97,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func makeRequest(message: [String: String], suffix: String){
         //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/"+suffix)!)
+        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
         request.httpMethod = "POST"
         let jsonData = try? JSONSerialization.data(withJSONObject: message, options: JSONSerialization.WritingOptions())
         request.httpBody = jsonData
