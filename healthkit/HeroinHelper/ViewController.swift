@@ -19,8 +19,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var timer = Timer()
     var counter = 0
     
+    @IBOutlet weak var contactPreference: UISwitch!
+    @IBOutlet weak var emergencyName: UITextField!
+    @IBOutlet weak var emergencyNumber: UITextField!
     @IBAction func hourSlider(_ sender: UISlider) {
-        sliderLabel.text = String(format: "%.2f", sender.value)
+        sliderLabel.text = "Hours to Monitor For: " + String(format: "%.2f", sender.value)
+        mainLabel.text = emergencyNumber.text
     }
     
     @IBOutlet weak var mainLabel: UILabel!
@@ -28,8 +32,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     //Called with every press of main button
     @IBAction func shootUp(_ sender: UIButton) {
-        
+        //Post current filled out contact info
+        postContact()
+        //Post lat long coordinates
+        sendLatLongRequest()
         //Create Timer
+        timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
     }
     
@@ -41,7 +49,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         locManager.requestAlwaysAuthorization()
-        sendLatLongRequest()
     }
     
     func timerAction(){
@@ -83,7 +90,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let latitude = latitude_numeric.stringValue
         
         //Make the actual request
-        let json: [String: String] = ["latitude": latitude, "longitude": longitude]
+        let json: [String: Any] = ["latitude": latitude, "longitude": longitude]
         makeRequest(message: json, suffix: "location")
     }
 
@@ -97,6 +104,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         location = locations[0]
     }
     
+    func postContact(){
+        let name = emergencyName.text
+        let number = emergencyNumber.text
+        var preference = ""
+        if(contactPreference.isOn){
+            preference = "text"
+        }else{
+            preference = "call"
+        }
+        let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference]
+        makeRequest(message: json, suffix: "contact-info")
+    }
 
     func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server

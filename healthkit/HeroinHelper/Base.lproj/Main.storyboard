@@ -57,8 +57,8 @@
                                             <action selector="hourSlider:" destination="BYZ-38-t0r" eventType="valueChanged" id="xw6-fy-tJu"/>
                                         </connections>
                                     </slider>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=".5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IWg-R4-gne">
-                                        <rect key="frame" x="164.5" y="404.5" width="14.5" height="81"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hours to Monitor For: .5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IWg-R4-gne">
+                                        <rect key="frame" x="80.5" y="404.5" width="182" height="81"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -66,7 +66,7 @@
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="baF-89-mCa">
                                         <rect key="frame" x="147" y="485.5" width="51" height="80.5"/>
                                     </switch>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Call/Text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Yc-zb-08A">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Call/Text" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Yc-zb-08A">
                                         <rect key="frame" x="0.0" y="566" width="343" height="81"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="48"/>
                                         <nil key="textColor"/>
@@ -94,6 +94,9 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="contactPreference" destination="baF-89-mCa" id="y49-gm-ljI"/>
+                        <outlet property="emergencyName" destination="68T-pA-T16" id="xlv-hu-b6K"/>
+                        <outlet property="emergencyNumber" destination="bix-Zf-7h6" id="9j9-Rf-Hfd"/>
                         <outlet property="mainLabel" destination="zeI-yn-sd7" id="I0o-Wl-Uir"/>
                         <outlet property="sliderLabel" destination="IWg-R4-gne" id="f3g-Ta-wVy"/>
                     </connections>
