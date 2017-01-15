@@ -2,7 +2,7 @@ import simplejson as json
 from flask import Flask, current_app
 from flask import request
 
-from interpreter import is_overdose, is_fake_kill
+from interpreter import is_simple_overdose, is_fake_kill
 from response import Response
 
 app = Flask(__name__)
@@ -54,7 +54,7 @@ def get_hr():
     # date = parsed['date']
     # time = parsed['time']
     heart_rates.append(heart_rate)
-    if is_overdose(heart_rate):
+    if is_simple_overdose(heart_rate):
         return "Overdose."
     return "HR okay."
 
