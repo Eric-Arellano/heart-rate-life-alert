@@ -155,32 +155,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         request.httpBody = postedJSON
         
         //Run task that calls the actual POST
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            guard let data = data, error == nil else {
-//                print(error?.localizedDescription ?? "No data")
-//                return
-//            }
-//            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
-//            if let responseJSON = responseJSON as? [String: Any] {
-//                print(responseJSON)
-//            }
-//        }
-        
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                        guard let data = data, error == nil else {                                                 // check for fundamental networking error
-                                print("error=\(error)")
-                                return
-                            }
+            //check for networking errors
+            guard let data = data, error == nil else {
+                print("error=\(error)")
+                return
+            }
+            //check for http errors
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+               print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("response = \(response)")
+            }
             
-                        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-                                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                                    print("response = \(response)")
-                            }
+            let responseString = String(data: data, encoding: .utf8)
+            print("responseString = \(responseString!)")
             
-                        let responseString = String(data: data, encoding: .utf8)
-                        print("responseString = \(responseString!)")
-                    }
-                    task.resume()
+        }
+        task.resume()
     }
     
     func processOverdose(){
