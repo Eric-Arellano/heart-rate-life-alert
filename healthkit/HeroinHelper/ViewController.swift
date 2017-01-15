@@ -17,7 +17,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let healthStore = HKHealthStore()
     var location = CLLocation()
     var timer = Timer()
-    var counter = 0
+    var timer2 = Timer()
+    var inDanger = false
     
     @IBOutlet weak var contactPreference: UISwitch!
     @IBOutlet weak var emergencyName: UITextField!
@@ -25,9 +26,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var contactCause: UITextField!
     
     @IBOutlet weak var mainLabel: UILabel!
+    var count = 0
+    var trackingEnabled = false
     
     //Called with every press of main button
     @IBAction func startMonitor(_ sender: UIButton) {
+        trackingEnabled = true
         //Post current filled out contact info
         postContact()
         //Post lat long coordinates
@@ -37,6 +41,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //Create Timer
         timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        
     }
     
     //
@@ -46,18 +51,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     @IBAction func stopMonitoring(_ sender: UIButton) {
-        //Stop updating of Heart Rate
-        timer.invalidate()
-        //Tell server to Stop
-        let json: [String: Any] = ["stop": "stop"]
-        makeRequest(message: json, suffix: "stop-app")
+        if(trackingEnabled==true){
+            //Stop updating of Heart Rate
+            timer.invalidate()
+            //Tell server to Stop
+            let json: [String: Any] = ["stop": "stop"]
+            makeRequest(message: json, suffix: "stop-app")
+        }else{
+            trackingEnabled = false
+        }
     }
     
     //For demonstration purposes, pretend HR is -1
     @IBAction func kill(_ sender: UIButton) {
-        //Send POST that server knows is a fake kill
-        let json: [String: Any] = ["heart_rate": "-1"]
-        makeRequest(message: json, suffix: "fake-kill")
+        if(trackingEnabled==true){
+            //Send POST that server knows is a fake kill
+            let json: [String: Any] = ["heart_rate": "-1"]
+            makeRequest(message: json, suffix: "fake-kill")
+        }else{
+            trackingEnabled = false
+        }
     }
     
     override func viewDidLoad() {
@@ -149,7 +162,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://172.20.10.6:5000/"+suffix)!)
+        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
         request.httpMethod = "POST"
         let postedJSON = try? JSONSerialization.data(withJSONObject: message)
         request.httpBody = postedJSON
@@ -170,9 +183,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
             let responseString = String(data: data, encoding: .utf8)
             print("responseString = \(responseString!)")
-            
+            if(responseString=="Overdose." || responseString=="Fake kill."){
+                self.inDanger = true
+                let alertController = UIAlertController(title: "Are you ok?", message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds", preferredStyle: .alert)
+                
+                let action = UIAlertAction(title: "I am ok", style: .default, handler: self.markInDangerFalse)
+                alertController.addAction(action)
+                DispatchQueue.main.async {
+                    self.present(alertController, animated: true, completion: nil)
+                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(self.timer2Action), userInfo: nil, repeats: false)
+                }
+
+                
+            }
         }
         task.resume()
+    }
+    
+    func markInDangerFalse(alert: UIAlertAction!){
+        inDanger = false
+    }
+    
+    func timer2Action(){
+        if(inDanger==true){
+            let json: [String: Any] = ["master-kill": "master-kill"]
+            self.makeRequest(message: json, suffix: "master-kill")
+        }
     }
     
     func processOverdose(){
