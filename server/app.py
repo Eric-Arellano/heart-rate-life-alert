@@ -30,6 +30,7 @@ def get_location():
     response.location = str(latitude) + "," + str(longitude)
     return "Location received."
 
+
 @app.route('/hr', methods=['GET', 'POST'])
 def get_hr():
     # get data
@@ -58,8 +59,8 @@ def get_contact_number():
     parsed = json.loads(js)
     response.contact_number = "+1" + parsed['contact_number']
     response.contact_name = parsed['contact_name']
-    cause = parsed['contact_cause']
-    contact_preference = parsed['contact_preference']
+    response.contact_preference = parsed['contact_preference']
+    response.cause = parsed['contact_cause']
     return 'Contact preferences received.'
 
 

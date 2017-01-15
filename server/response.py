@@ -12,16 +12,32 @@ client = TwilioRestClient(account_sid, auth_token)
 class Response:
     from_number = "+15202144342"
 
-    def __init__(self, location="unknown", contact_number="+19258585614", contact_name="Eric"):
+    def __init__(self,
+                 user_name="Abhik Chowdhury",
+                 location="unknown",
+                 contact_number="+19258585614",
+                 contact_name="Eric",
+                 contact_preference="text",
+                 cause="overdose"):
+        self.user_name = user_name
         self.location = location
         self.contact_number = contact_number
         self.contact_name = contact_name
+        self.contact_preference = contact_preference
+        self.cause = cause
 
-    # TODO: add initiation text
+    def notify_contact_of_start(self):
+        message = self.contact_name + ", this message is to let you know that your friend " + self.user_name + \
+                  " has started to track their heart rate to avoid " + self.cause + ". They put you down as their " \
+                                                                                    "contact in case anything bad happens. You will be notified by " + self.contact_preference + \
+                  " if we notice anything peculiar."
+        self.send_text(self.contact_number, self.from_number, message)
 
     def trigger_response(self):
-        message = self.contact_name + ", your friend has overdosed. They are located at " + self.location \
-                  + ". Please respond immediately."
+        # TODO: convert lat long to address
+        message = self.contact_name + ", your friend " + self.user_name + "has reached a dangerous heart rate level. " \
+                                                                          "This may be a " + self.cause + ".\nThey are located at " + self.location \
+                  + ". Please respond immediately and consider calling 911."
         map_url = create_map_url(self.location)
         self.send_text(self.contact_number, self.from_number, message, map_url)
 
