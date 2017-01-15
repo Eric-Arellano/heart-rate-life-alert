@@ -1,21 +1,62 @@
-from get_requests import get_hr, get_location, get_contact_number
+from flask import Flask
+from flask import request
+import simplejson as json
+
 from interpreter import is_overdose
 from response import Response
 
-# wait till app starts w/ GPS and friend data
+app = Flask(__name__)
 
-# initialize with GPS and friend data
-location = get_location()
-contact_number = get_contact_number()
-response = Response(location, contact_number)
+heart_rates = []
+response = Response()
 
-# continuously check and interpret HR
-while True:
-    heart_rate = get_hr()
+
+@app.route('/startsession', methods=['GET', 'POST'])
+def start_session():
+    pass
+
+
+@app.route('/location', methods=['GET', 'POST'])
+def get_location():
+    # get data
+    raw = request.data
+    parsed = json.loads(raw)
+    latitude = parsed['latitude']
+    longitude = parsed['longitude']
+    # return
+    response.location = str(latitude) + ", " + str(longitude)
+
+
+@app.route('/hr', methods=['GET', 'POST'])
+def get_hr():
+    # get data
+    raw = request.data
+    parsed = json.loads(raw)
+    heart_rate = parsed['heart_rate']
+    date = parsed['date']
+    time = parsed['time']
+    # return
+    heart_rates.append(heart_rate)
     if is_overdose(heart_rate):
         response.trigger_response()
-    else:
-        pass
+
+
+@app.route('/contact-info', methods=['GET', 'POST'])
+def get_contact_number():
+    raw = request.data
+    parsed = json.loads(raw)
+    response.contact_number = parsed['contact_number']
+    response.contact_name = parsed['contact_name']
+    contact_preference = parsed['contact_preference']
+
+
+@app.route('/overdose', methods=['GET', 'POST'])
+def warn_overdose():
+    pass
+
+
+if __name__ == "__main__":
+    app.run()
 
 # TODO: migrate to session-based design, server should run continuously
 # Session has its own HR list and Response object with location and contact info
