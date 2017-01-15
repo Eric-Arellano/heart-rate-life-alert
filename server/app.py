@@ -11,27 +11,33 @@ heart_rates = []
 response = Response()
 
 
-@app.route('/startsession', methods=['GET', 'POST'])
+@app.route('/dashboard', methods=['GET'])
 def start_session():
-    pass
+    return ", ".join(heart_rates)
 
 
 @app.route('/location', methods=['GET', 'POST'])
 def get_location():
     # get data
-    raw = request.data
-    parsed = json.loads(raw)
+    raw = request.form
+    for jsonString in raw:
+        js = jsonString
+        print jsonString
+    parsed = json.loads(js)
     latitude = parsed['latitude']
     longitude = parsed['longitude']
     # return
-    response.location = str(latitude) + ", " + str(longitude)
-
+    response.location = str(latitude) + "," + str(longitude)
+    return "Location received."
 
 @app.route('/hr', methods=['GET', 'POST'])
 def get_hr():
     # get data
-    raw = request.data
-    parsed = json.loads(raw)
+    raw = request.form
+    for jsonString in raw:
+        js = jsonString
+        print jsonString
+    parsed = json.loads(js)
     heart_rate = parsed['heart_rate']
     date = parsed['date']
     time = parsed['time']
@@ -39,28 +45,28 @@ def get_hr():
     heart_rates.append(heart_rate)
     if is_overdose(heart_rate):
         response.trigger_response()
+        return "Overdose."
+    return "HR okay."
 
 
 @app.route('/contact-info', methods=['GET', 'POST'])
 def get_contact_number():
-    raw = request.data
-    parsed = json.loads(raw)
-    response.contact_number = parsed['contact_number']
+    raw = request.form
+    for jsonString in raw:
+        js = jsonString
+        print jsonString
+    parsed = json.loads(js)
+    response.contact_number = "+1" + parsed['contact_number']
     response.contact_name = parsed['contact_name']
+    cause = parsed['contact_cause']
     contact_preference = parsed['contact_preference']
+    return 'Contact preferences received.'
 
 
-@app.route('/overdose', methods=['GET', 'POST'])
-def warn_overdose():
+@app.route('/stop', methods=['GET', 'POST'])
+def stop_app():
     pass
 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
-
-# TODO: migrate to session-based design, server should run continuously
-# Session has its own HR list and Response object with location and contact info
-# Start a new session each time app is opened, phone POSTs to '/startsession' with location
-# '/contact-info' will update the session's number
-# During session, continuously check HR at '/hr' and interpret result
-# If response triggered, close session (but keep server running)
