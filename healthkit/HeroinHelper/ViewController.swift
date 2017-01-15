@@ -77,13 +77,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func sendLatLongRequest(){
         //Get location -> convert that to numbers -> then to String for passing to POST
         let currentLocation = locManager.location
-        let long2 = NSNumber(value: currentLocation!.coordinate.longitude)
-        let lat2 = NSNumber(value: currentLocation!.coordinate.latitude)
-        let long = long2.stringValue
-        let lat = lat2.stringValue
+        let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
+        let latitude_numeric = NSNumber(value: currentLocation!.coordinate.latitude)
+        let longitude = longitude_numeric.stringValue
+        let latitude = latitude_numeric.stringValue
         
         //Make the actual request
-        let message: [String: Any] = ["latitude": lat, "longitude": long]
+        let message: [String: Any] = ["latitude": latitude, "longitude": longitude]
         makeRequest(message: message, suffix: "location")
     }
 
@@ -101,8 +101,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //Set up request format for interacting with Python server
         var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/"+suffix)!)
         request.httpMethod = "POST"
-        let postString = try? JSONSerialization.data(withJSONObject: message)
-        request.httpBody = postString
+        let postedJSON = try? JSONSerialization.data(withJSONObject: message)
+        request.httpBody = postedJSON
         
         //Run task that calls the actual POST
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
