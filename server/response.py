@@ -30,7 +30,7 @@ class Response:
         message = self.contact_name + ", this message is to let you know that your friend " + self.user_name + \
                   " has started to track their heart rate to avoid: " + self.cause + \
                   ". They put you down as their contact in case anything bad happens. You will be notified by " \
-                  + self.contact_preference + "if we notice anything peculiar."
+                  + self.contact_preference + " if we notice anything peculiar."
         self.send_text(self.contact_number, self.from_number, message)
 
     def trigger_response(self):
@@ -39,12 +39,19 @@ class Response:
                   " has reached a dangerous heart rate level. This may be due to: " \
                   + self.cause + ".\nThey are located at " + self.location \
                   + ". Please respond immediately and consider calling 911."
-        map_url = create_map_url(self.location)
-        self.send_text(self.contact_number, self.from_number, message, map_url)
+        if self.contact_preference == 'text':
+            map_url = create_map_url(self.location)
+            self.send_text(self.contact_number, self.from_number, message, map_url)
+        elif self.contact_preference == 'call':
+            script_url = None  # TODO: how to get phone script URL and use variables?
+            self.start_call(self.contact_number, self.from_number, script_url)
 
     @staticmethod
     def send_text(to, from_, message, map_url=None):
         message = client.messages.create(to=to, from_=from_, body=message, media_url=map_url)
         print(message.sid)
 
-        # TODO: Add calls
+    @staticmethod
+    def start_call(to, from_, script_url):
+        call = client.calls.create(to=to, from_=from_, url=script_url)
+        print(call.sid)

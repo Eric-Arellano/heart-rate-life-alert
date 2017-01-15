@@ -1,0 +1,12 @@
+<Response>
+    <Say voice="alice">
+        contactName +
+        ", your friend " +
+        userName +
+        " has reached a dangerous heart rate level. This may be due to: "
+        cause +
+        ".\n They are located at "
+        location +
+        ". Please respond immediately and consider calling 911."
+    </Say>
+</Response>
