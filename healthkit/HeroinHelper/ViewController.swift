@@ -32,9 +32,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         postContact()
         //Post lat long coordinates
         sendLatLongRequest()
+        //Notify contact initially
+        notifyContactPost()
         //Create Timer
         timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+    }
+    
+    //
+    func notifyContactPost(){
+        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
+        makeRequest(message: json, suffix: "start-monitoring")
     }
     
     @IBAction func stopMonitoring(_ sender: UIButton) {
@@ -42,12 +50,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         timer.invalidate()
         //Tell server to Stop
         let json: [String: Any] = ["stop": "stop"]
-        makeRequest(message: json, suffix: "stop")
+        makeRequest(message: json, suffix: "stop-app")
     }
     
+    //For demonstration purposes, pretend HR is -1
     @IBAction func kill(_ sender: UIButton) {
-        let json: [String: Any] = ["heart_rate": "1"]
-        makeRequest(message: json, suffix: "fake_kill")
+        //Send POST that server knows is a fake kill
+        let json: [String: Any] = ["heart_rate": "-1"]
+        makeRequest(message: json, suffix: "fake-kill")
     }
     
     override func viewDidLoad() {
@@ -58,8 +68,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         locManager.requestAlwaysAuthorization()
+        //Dismiss keyboard by tapping off of it
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissKeyboard))
-        //tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
 
@@ -139,23 +149,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
+        var request = URLRequest(url: URL(string: "http://172.20.10.6:5000/"+suffix)!)
         request.httpMethod = "POST"
         let postedJSON = try? JSONSerialization.data(withJSONObject: message)
         request.httpBody = postedJSON
         
         //Run task that calls the actual POST
+//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+//            guard let data = data, error == nil else {
+//                print(error?.localizedDescription ?? "No data")
+//                return
+//            }
+//            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+//            if let responseJSON = responseJSON as? [String: Any] {
+//                print(responseJSON)
+//            }
+//        }
+        
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error?.localizedDescription ?? "No data")
-                return
-            }
-            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
-            if let responseJSON = responseJSON as? [String: Any] {
-                print(responseJSON)
-            }
-        }
-        task.resume()
+                        guard let data = data, error == nil else {                                                 // check for fundamental networking error
+                                print("error=\(error)")
+                                return
+                            }
+            
+                        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+                                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                                    print("response = \(response)")
+                            }
+            
+                        let responseString = String(data: data, encoding: .utf8)
+                        print("responseString = \(responseString!)")
+                    }
+                    task.resume()
     }
     
     func processOverdose(){
