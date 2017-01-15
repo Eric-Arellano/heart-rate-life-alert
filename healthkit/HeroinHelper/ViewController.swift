@@ -63,7 +63,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                         let quantity = (quantitySample as! HKQuantitySample).quantity
                         let heartRateUnit = HKUnit(from: "count/min")
                         csvString = "{ time: \(timeFormatter.string(from: quantitySample.startDate)), date: \(dateFormatter.string(from: quantitySample.startDate)), heart_rate: \(quantity.doubleValue(for: heartRateUnit)) }"
-                        self.makeRequest(message: csvString, suffix: "hr")
+                        let json: [String: String] = ["time": "\(timeFormatter.string(from: quantitySample.startDate))", "date": "\(dateFormatter.string(from: quantitySample.startDate))", "heart_rate": "\(quantity.doubleValue(for: heartRateUnit))"]
+                        self.makeRequest(message: json, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
@@ -80,7 +81,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let lat = lat2.stringValue
         
         //Make the actual request
-        makeRequest(message: ("{ latitude: " + lat + ", longitude: " + long + " }"), suffix: "location")
+        let json: [String: String] = ["latitude": lat, "longitude": long]
+        makeRequest(message: json, suffix: "location")
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,31 +95,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         location = locations[0]
     }
     
-    func makeRequest(message: String, suffix: String){
+    func makeRequest(message: [String: String], suffix: String){
         //Set up request format for interacting with Python server
         var request = URLRequest(url: URL(string: "http://192.168.43.36:5000/"+suffix)!)
         request.httpMethod = "POST"
-        let postString = message
-        request.httpBody = postString.data(using: .utf8)
+        let jsonData = try? JSONSerialization.data(withJSONObject: message, options: JSONSerialization.WritingOptions())
+        request.httpBody = jsonData
         
         //Run task that calls the actual POST
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            //Handle networking errors
             guard let data = data, error == nil else {
-                print("error=\(error)")
+                print(error?.localizedDescription ?? "No data")
                 return
             }
-            
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-            }
-            
-            //Get response from server
-            let responseString = String(data: data, encoding: .utf8)
-            print("responseString = \(responseString)")
-            if(responseString=="overdose"){
-                self.processOverdose()
+            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+            if let responseJSON = responseJSON as? [String: Any] {
+                print(responseJSON)
             }
         }
         task.resume()
