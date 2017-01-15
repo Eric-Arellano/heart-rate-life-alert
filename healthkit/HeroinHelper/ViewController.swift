@@ -47,7 +47,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func timerAction(){
         //Get heart rate, post to Python Server
         let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
-        var csvString = ""
+        var cvsDict: [String: Any] = [:]
         if (HKHealthStore.isHealthDataAvailable()){
             self.healthStore.requestAuthorization(toShare: nil, read:[heartRateType], completion:{(success, error) in
                 let sortByTime = NSSortDescriptor(key:HKSampleSortIdentifierEndDate, ascending:false)
@@ -61,10 +61,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     guard let results = results else { return }
                     for quantitySample in results {
                         let quantity = (quantitySample as! HKQuantitySample).quantity
+                        let time = timeFormatter.string(from: quantitySample.startDate)
+                        let date = dateFormatter.string(from: quantitySample.startDate)
                         let heartRateUnit = HKUnit(from: "count/min")
-                        csvString = "{ time: \(timeFormatter.string(from: quantitySample.startDate)), date: \(dateFormatter.string(from: quantitySample.startDate)), heart_rate: \(quantity.doubleValue(for: heartRateUnit)) }"
-                        let json: [String: String] = ["time": "\(timeFormatter.string(from: quantitySample.startDate))", "date": "\(dateFormatter.string(from: quantitySample.startDate))", "heart_rate": "\(quantity.doubleValue(for: heartRateUnit))"]
-                        self.makeRequest(message: json, suffix: "hr")
+                        let heartRate = quantity.doubleValue(for: heartRateUnit)
+                        cvsDict = ["time": time, "date": date, "heart_rate": heartRate]
+                        self.makeRequest(message: cvsDict, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
@@ -75,13 +77,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func sendLatLongRequest(){
         //Get location -> convert that to numbers -> then to String for passing to POST
         let currentLocation = locManager.location
-        let long2 = NSNumber(value: currentLocation!.coordinate.longitude)
-        let lat2 = NSNumber(value: currentLocation!.coordinate.latitude)
-        let long = long2.stringValue
-        let lat = lat2.stringValue
+        let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
+        let latitude_numeric = NSNumber(value: currentLocation!.coordinate.latitude)
+        let longitude = longitude_numeric.stringValue
+        let latitude = latitude_numeric.stringValue
         
         //Make the actual request
-        let json: [String: String] = ["latitude": lat, "longitude": long]
+        let json: [String: String] = ["latitude": latitude, "longitude": longitude]
         makeRequest(message: json, suffix: "location")
     }
 
@@ -95,12 +97,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         location = locations[0]
     }
     
-    func makeRequest(message: [String: String], suffix: String){
+
+    func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
         var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
         request.httpMethod = "POST"
-        let jsonData = try? JSONSerialization.data(withJSONObject: message, options: JSONSerialization.WritingOptions())
-        request.httpBody = jsonData
+        let postedJSON = try? JSONSerialization.data(withJSONObject: message)
+        request.httpBody = postedJSON
         
         //Run task that calls the actual POST
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
