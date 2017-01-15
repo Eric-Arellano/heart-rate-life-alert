@@ -13,7 +13,7 @@ response = Response()
 
 @app.route('/dashboard', methods=['GET'])
 def start_session():
-    return ", ".join(heart_rates);
+    return ", ".join(heart_rates)
 
 
 @app.route('/location', methods=['GET', 'POST'])
@@ -28,7 +28,7 @@ def get_location():
     longitude = parsed['longitude']
     # return
     response.location = str(latitude) + ", " + str(longitude)
-    return "hi"
+    return "Location received."
 
 @app.route('/hr', methods=['GET', 'POST'])
 def get_hr():
@@ -45,7 +45,9 @@ def get_hr():
     heart_rates.append(heart_rate)
     if is_overdose(heart_rate):
         response.trigger_response()
-    return "hi"
+        return "Overdose."
+    return "HR okay."
+
 
 @app.route('/contact-info', methods=['GET', 'POST'])
 def get_contact_number():
@@ -57,13 +59,7 @@ def get_contact_number():
     response.contact_number = "+1" + parsed['contact_number']
     response.contact_name = parsed['contact_name']
     contact_preference = parsed['contact_preference']
-    return 'hi'
-
-
-@app.route('/overdose', methods=['GET', 'POST'])
-def warn_overdose():
-    # TODO: add kill switch
-    pass
+    return 'Contact preferences received.'
 
 
 if __name__ == "__main__":
