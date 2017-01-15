@@ -2,7 +2,7 @@ import simplejson as json
 from flask import Flask
 from flask import request
 
-from interpreter import is_overdose
+from interpreter import is_overdose, is_fake_kill
 from response import Response
 
 app = Flask(__name__)
@@ -64,7 +64,21 @@ def get_contact_number():
     return 'Contact preferences received.'
 
 
-@app.route('/stop', methods=['GET', 'POST'])
+@app.route('/fake-kill', methods=['GET', 'POST'])
+def fake_kill():
+    raw = request.form
+    for jsonString in raw:
+        js = jsonString
+        print jsonString
+    parsed = json.loads(js)
+    heart_rate = parsed['heart_rate']
+    if is_fake_kill(heart_rate):
+        response.trigger_response()
+        return "Fake kill."
+    return "Fake kill not triggered."
+
+
+@app.route('/stop-app', methods=['GET', 'POST'])
 def stop_app():
     pass
 
