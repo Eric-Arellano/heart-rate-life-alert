@@ -20,6 +20,7 @@ class Response:
         self.send_text(self.contact_number, self.from_number, message)
 
     def create_message(self):
+        # TODO: create personalized message
         return "WARNING: your friend has overdosed. Please respond immediately."
 
     @staticmethod
