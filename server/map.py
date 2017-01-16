@@ -1,4 +1,8 @@
+import os  # for API keys
+
 import requests
+
+google_key = os.environ.get('GOOGLE_KEY')
 
 def create_map_url(location):
     if location != 'unknown':
@@ -7,13 +11,13 @@ def create_map_url(location):
                "&size=600x300" \
                "&maptype=roadmap" \
                "&markers=color:red%7C%7C" + location + \
-               "&key=AIzaSyBfgt8K5q-VmaO5T5lkzgWgZADbbo3kfRk"
+               "&key=" + google_key
 
 
 def translate_latlong_to_address(latlong):
     url = "https://maps.googleapis.com/maps/api/geocode/json" \
           "?latlng=" + latlong + \
-          "&key=AIzaSyBfgt8K5q-VmaO5T5lkzgWgZADbbo3kfRk"
+          "&key=" + google_key
     connection = requests.post(url)
     data = connection.json()
     print data
