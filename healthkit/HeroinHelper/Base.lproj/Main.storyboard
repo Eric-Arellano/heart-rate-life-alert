@@ -28,7 +28,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hi, Eric. I'm here to help." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zeI-yn-sd7">
                                         <rect key="frame" x="32.5" y="0.0" width="278" height="62"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="26"/>
-                                        <nil key="textColor"/>
+                                        <color key="textColor" red="0.99963909390000005" green="1" blue="0.99975615740000001" alpha="1" colorSpace="deviceRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Emergency Contact Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="68T-pA-T16">
@@ -52,7 +52,9 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nca-3Y-B3G">
                                         <rect key="frame" x="0.0" y="238.5" width="343" height="124"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="42"/>
-                                        <state key="normal" title="Start Monitoring"/>
+                                        <state key="normal" title="Start Monitoring">
+                                            <color key="titleColor" red="0.95341525046875442" green="0.97937456241051835" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="startMonitor:" destination="BYZ-38-t0r" eventType="touchUpInside" id="qJV-is-aTK"/>
                                         </connections>
@@ -60,7 +62,9 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8CO-fM-nTN">
                                         <rect key="frame" x="24.5" y="362.5" width="294" height="123.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="42"/>
-                                        <state key="normal" title="Stop Monitoring"/>
+                                        <state key="normal" title="Stop Monitoring">
+                                            <color key="titleColor" red="0.99963909390000005" green="1" blue="0.99975615740000001" alpha="1" colorSpace="deviceRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="stopMonitoring:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g5F-fe-PoX"/>
                                         </connections>
@@ -71,7 +75,9 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xMO-xc-jt6">
                                         <rect key="frame" x="140.5" y="547" width="62" height="100"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="32"/>
-                                        <state key="normal" title="KILL"/>
+                                        <state key="normal" title="KILL">
+                                            <color key="titleColor" red="0.99963909390000005" green="1" blue="0.99975615740000001" alpha="1" colorSpace="deviceRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="kill:" destination="BYZ-38-t0r" eventType="touchUpInside" id="RYb-iE-IEf"/>
                                         </connections>
@@ -89,7 +95,7 @@
                                 </constraints>
                             </stackView>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.70676813471502586" green="0.15815026596995096" blue="0.25129811913020328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Ugq-5v-WmV" secondAttribute="bottom" id="ARQ-f1-w0q"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Ugq-5v-WmV" secondAttribute="trailing" id="Zsd-I1-JsE"/>
