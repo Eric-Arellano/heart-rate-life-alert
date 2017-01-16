@@ -11,12 +11,6 @@ heart_rates = []
 response = Response()
 
 
-# test call feature + translate latlong
-# print(translate_latlong_to_address('37.785834,-122.406417'))
-# response.contact_preference = 'call'
-# response.trigger_response()
-
-
 @app.route('/dashboard', methods=['GET'])
 def return_heart_rates():
     return ", ".join(heart_rates)

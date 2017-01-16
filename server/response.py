@@ -1,4 +1,4 @@
-from map import create_map_url
+from location import create_map_url
 from twilio import send_text, start_call, generate_twiml, write_twiml_to_file
 
 
