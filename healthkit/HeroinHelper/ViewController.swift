@@ -16,8 +16,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var locManager = CLLocationManager()
     let healthStore = HKHealthStore()
     var location = CLLocation()
-    var timer = Timer()
-    var timer2 = Timer()
+    var heartRateTimer = Timer()
+    var alertTimer = Timer()
     var inDanger = false
     
     @IBOutlet weak var contactPreference: UISwitch!
@@ -86,8 +86,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     
     func createHeartRateTimer() {
-        timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 5.0,
+        heartRateTimer.invalidate()
+        heartRateTimer = Timer.scheduledTimer(timeInterval: 5.0,
                                      target: self,
                                      selector: #selector(getAndPostHeartRate),
                                      userInfo: nil,
@@ -200,7 +200,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     self.present(alertController,
                                  animated: true,
                                  completion: nil)
-                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0,
+                    self.alertTimer = Timer.scheduledTimer(timeInterval: 30.0,
                                                        target: self,
                                                        selector: #selector(self.triggerMasterKill),
                                                        userInfo: nil,
@@ -250,7 +250,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBAction func stopMonitoring(_ sender: UIButton) {
         if(trackingEnabled==true){
             //Stop updating of Heart Rate
-            timer.invalidate()
+            heartRateTimer.invalidate()
             //Tell server to Stop
             let json: [String: Any] = ["stop": "stop"]
             postJSON(message: json, suffix: "stop-app")
@@ -259,8 +259,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func stopTimer(){
-        timer.invalidate()
+    func stopHeartRateTimer(){
+        heartRateTimer.invalidate()
     }
     
 
