@@ -67,9 +67,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     //Called with every press of main button
     @IBAction func startMonitoring(_ sender: UIButton) {
         monitoringActivated = true
-        postJSON(message: getContactInfo(),
+        postJSON(json: getContactInfo(),
                  suffix: "contact-info")
-        postJSON(message: getLatLong(),
+        postJSON(json: getLatLong(),
                  suffix: "location")
         notifyContactOfMonitoring()
         createHeartRateTimer()
@@ -77,7 +77,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func notifyContactOfMonitoring(){
         let json: [String: Any] = ["start-monitoring": "start-monitoring"]
-        postJSON(message: json, suffix: "start-monitoring")
+        postJSON(json: json, suffix: "start-monitoring")
     }
     
  
@@ -115,7 +115,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                         let heartRateUnit = HKUnit(from: "count/min")
                         let heartRate = quantity.doubleValue(for: heartRateUnit)
                         cvsDict = ["time": time, "date": date, "heart_rate": heartRate]
-                        self.postJSON(message: cvsDict, suffix: "hr")
+                        self.postJSON(json: cvsDict, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
@@ -162,15 +162,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
 
 
-    func postJSON(message: [String: Any], suffix: String){
-        //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
-        request.httpMethod = "POST"
-        let postedJSON = try? JSONSerialization.data(withJSONObject: message)
-        request.httpBody = postedJSON
+    func postJSON(json: [String: Any], suffix: String){
+        let request = self.setupRequest(json: json, suffix: suffix)
         
         //Run task that calls the actual POST
-
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             //check for networking errors
             guard let data = data, error == nil else {
@@ -189,6 +184,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             self.interpretResponseStringToTriggerKill(responseString: responseString!)
         }
         task.resume()
+    }
+    
+    func setupRequest(json: [String: Any], suffix: String) -> URLRequest {
+        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
+        request.httpMethod = "POST"
+        let postedJSON = try? JSONSerialization.data(withJSONObject: json)
+        request.httpBody = postedJSON
+        return request
     }
     
     func interpretResponseStringToTriggerKill(responseString: String) {
@@ -243,7 +246,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func triggerMasterKill(){
         let json: [String: Any] = ["master-kill": "master-kill"]
-        self.postJSON(message: json, suffix: "master-kill")
+        self.postJSON(json: json, suffix: "master-kill")
     }
 
     
@@ -275,7 +278,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func notifyServerStopMonitoring() {
         let json: [String: Any] = ["stop": "stop"]
-        postJSON(message: json, suffix: "stop-app")
+        postJSON(json: json, suffix: "stop-app")
     }
 
 }
