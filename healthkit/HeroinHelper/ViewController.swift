@@ -65,18 +65,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     
     //Called with every press of main button
-    @IBAction func startMonitor(_ sender: UIButton) {
+    @IBAction func startMonitoring(_ sender: UIButton) {
         trackingEnabled = true
-        //Post current filled out contact info
-        postContact()
-        //Post lat long coordinates
-        sendLatLongRequest()
-        //Notify contact initially
-        notifyContactPost()
-        //Create Timer
-        timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
-        
+        getAndPostContactInfo()
+        getAndPostLatLong()
+        notifyContactOfMonitoring()
+        createHeartRateTimer()
     }
     
  
@@ -84,8 +78,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // Heart rate
     // ---------------------------------------------------------------------
     
-    func timerAction(){
-        //Get heart rate, post to Python Server
+    func createHeartRateTimer() {
+        timer.invalidate()
+        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(getAndPostHeartRate), userInfo: nil, repeats: true)
+    }
+    
+    func getAndPostHeartRate(){
         let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
         var cvsDict: [String: Any] = [:]
         if (HKHealthStore.isHealthDataAvailable()){
@@ -106,7 +104,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                         let heartRateUnit = HKUnit(from: "count/min")
                         let heartRate = quantity.doubleValue(for: heartRateUnit)
                         cvsDict = ["time": time, "date": date, "heart_rate": heartRate]
-                        self.makeRequest(message: cvsDict, suffix: "hr")
+                        self.postJSON(message: cvsDict, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
@@ -119,7 +117,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // Location
     // ---------------------------------------------------------------------
 
-    func sendLatLongRequest(){
+    func getAndPostLatLong(){
         //Get location -> convert that to numbers -> then to String for passing to POST
         let currentLocation = locManager.location
         let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
@@ -129,7 +127,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
         //Make the actual request
         let json: [String: Any] = ["latitude": latitude, "longitude": longitude]
-        makeRequest(message: json, suffix: "location")
+        postJSON(message: json, suffix: "location")
     }
 
     
@@ -143,7 +141,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // Contact info
     // ---------------------------------------------------------------------
     
-    func postContact(){
+    func getAndPostContactInfo(){
         let name = emergencyName.text
         let number = emergencyNumber.text
         let cause = contactCause.text
@@ -154,12 +152,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             preference = "call"
         }
         let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
-        makeRequest(message: json, suffix: "contact-info")
+        postJSON(message: json, suffix: "contact-info")
     }
     
-    func notifyContactPost(){
+    func notifyContactOfMonitoring(){
         let json: [String: Any] = ["start-monitoring": "start-monitoring"]
-        makeRequest(message: json, suffix: "start-monitoring")
+        postJSON(message: json, suffix: "start-monitoring")
     }
     
     
@@ -169,7 +167,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
 
 
-    func makeRequest(message: [String: Any], suffix: String){
+    func postJSON(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
         var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
         request.httpMethod = "POST"
@@ -200,7 +198,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 alertController.addAction(action)
                 DispatchQueue.main.async {
                     self.present(alertController, animated: true, completion: nil)
-                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(self.timer2Action), userInfo: nil, repeats: false)
+                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(self.triggerMasterKill), userInfo: nil, repeats: false)
                 }
 
                 
@@ -218,10 +216,30 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         inDanger = false
     }
     
-    func processOverdose(){
-        timer.invalidate()
+    
+    func triggerMasterKill(){
+        if(inDanger==true){
+            let json: [String: Any] = ["master-kill": "master-kill"]
+            self.postJSON(message: json, suffix: "master-kill")
+        }
     }
 
+    
+    @IBAction func kill(_ sender: UIButton) {
+        if(trackingEnabled==true) {
+            //Send POST that server knows is a fake kill
+            //For demonstration purposes, pretend HR is -1
+            let json: [String: Any] = ["heart_rate": "-1"]
+            postJSON(message: json, suffix: "fake-kill")
+        } else {
+            trackingEnabled = false
+        }
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Stop monitoring
+    // ---------------------------------------------------------------------
     
     @IBAction func stopMonitoring(_ sender: UIButton) {
         if(trackingEnabled==true){
@@ -229,30 +247,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             timer.invalidate()
             //Tell server to Stop
             let json: [String: Any] = ["stop": "stop"]
-            makeRequest(message: json, suffix: "stop-app")
+            postJSON(message: json, suffix: "stop-app")
         }else{
             trackingEnabled = false
         }
     }
     
-    //For demonstration purposes, pretend HR is -1
-    @IBAction func kill(_ sender: UIButton) {
-        if(trackingEnabled==true){
-            //Send POST that server knows is a fake kill
-            let json: [String: Any] = ["heart_rate": "-1"]
-            makeRequest(message: json, suffix: "fake-kill")
-        }else{
-            trackingEnabled = false
-        }
+    func stopTimer(){
+        timer.invalidate()
     }
+    
 
-    
-    func timer2Action(){
-        if(inDanger==true){
-            let json: [String: Any] = ["master-kill": "master-kill"]
-            self.makeRequest(message: json, suffix: "master-kill")
-        }
-    }
-    
-    }
+}
 
