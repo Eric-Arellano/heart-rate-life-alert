@@ -29,6 +29,41 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var count = 0
     var trackingEnabled = false
     
+    
+    // ---------------------------------------------------------------------
+    // UI
+    // ---------------------------------------------------------------------
+
+    
+    override func viewDidLoad() {
+        //Set up necessary location manager handling
+        super.viewDidLoad()
+        locManager.delegate = self
+        locManager.desiredAccuracy = kCLLocationAccuracyBest
+        locManager.requestWhenInUseAuthorization()
+        locManager.startUpdatingLocation()
+        locManager.requestAlwaysAuthorization()
+        //Dismiss keyboard by tapping off of it
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
+    }
+    
+    //Calls this function when the tap is recognized.
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Overall start monitoring
+    // ---------------------------------------------------------------------
+    
     //Called with every press of main button
     @IBAction func startMonitor(_ sender: UIButton) {
         trackingEnabled = true
@@ -44,54 +79,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
     }
     
-    //
-    func notifyContactPost(){
-        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
-        makeRequest(message: json, suffix: "start-monitoring")
-    }
-    
-    @IBAction func stopMonitoring(_ sender: UIButton) {
-        if(trackingEnabled==true){
-            //Stop updating of Heart Rate
-            timer.invalidate()
-            //Tell server to Stop
-            let json: [String: Any] = ["stop": "stop"]
-            makeRequest(message: json, suffix: "stop-app")
-        }else{
-            trackingEnabled = false
-        }
-    }
-    
-    //For demonstration purposes, pretend HR is -1
-    @IBAction func kill(_ sender: UIButton) {
-        if(trackingEnabled==true){
-            //Send POST that server knows is a fake kill
-            let json: [String: Any] = ["heart_rate": "-1"]
-            makeRequest(message: json, suffix: "fake-kill")
-        }else{
-            trackingEnabled = false
-        }
-    }
-    
-    override func viewDidLoad() {
-        //Set up necessary location manager handling
-        super.viewDidLoad()
-        locManager.delegate = self
-        locManager.desiredAccuracy = kCLLocationAccuracyBest
-        locManager.requestWhenInUseAuthorization()
-        locManager.startUpdatingLocation()
-        locManager.requestAlwaysAuthorization()
-        //Dismiss keyboard by tapping off of it
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissKeyboard))
-        view.addGestureRecognizer(tap)
-    }
-
-    //Calls this function when the tap is recognized.
-    func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-    }
-    
+ 
+    // ---------------------------------------------------------------------
+    // Heart rate
+    // ---------------------------------------------------------------------
     
     func timerAction(){
         //Get heart rate, post to Python Server
@@ -123,6 +114,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
+    
+    // ---------------------------------------------------------------------
+    // Location
+    // ---------------------------------------------------------------------
+
     func sendLatLongRequest(){
         //Get location -> convert that to numbers -> then to String for passing to POST
         let currentLocation = locManager.location
@@ -136,15 +132,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         makeRequest(message: json, suffix: "location")
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         //Get first location (most recent, relevant one) whenever location is updated
         location = locations[0]
     }
+    
+    
+    // ---------------------------------------------------------------------
+    // Contact info
+    // ---------------------------------------------------------------------
     
     func postContact(){
         let name = emergencyName.text
@@ -159,6 +156,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
         makeRequest(message: json, suffix: "contact-info")
     }
+    
+    func notifyContactPost(){
+        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
+        makeRequest(message: json, suffix: "start-monitoring")
+    }
+    
+    
+    
+    // ---------------------------------------------------------------------
+    // HTTP requests
+    // ---------------------------------------------------------------------
+
 
     func makeRequest(message: [String: Any], suffix: String){
         //Set up request format for interacting with Python server
@@ -200,9 +209,43 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         task.resume()
     }
     
+    
+    // ---------------------------------------------------------------------
+    // Kill/overdose
+    // ---------------------------------------------------------------------
+    
     func markInDangerFalse(alert: UIAlertAction!){
         inDanger = false
     }
+    
+    func processOverdose(){
+        timer.invalidate()
+    }
+
+    
+    @IBAction func stopMonitoring(_ sender: UIButton) {
+        if(trackingEnabled==true){
+            //Stop updating of Heart Rate
+            timer.invalidate()
+            //Tell server to Stop
+            let json: [String: Any] = ["stop": "stop"]
+            makeRequest(message: json, suffix: "stop-app")
+        }else{
+            trackingEnabled = false
+        }
+    }
+    
+    //For demonstration purposes, pretend HR is -1
+    @IBAction func kill(_ sender: UIButton) {
+        if(trackingEnabled==true){
+            //Send POST that server knows is a fake kill
+            let json: [String: Any] = ["heart_rate": "-1"]
+            makeRequest(message: json, suffix: "fake-kill")
+        }else{
+            trackingEnabled = false
+        }
+    }
+
     
     func timer2Action(){
         if(inDanger==true){
@@ -211,8 +254,5 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func processOverdose(){
-        timer.invalidate()
     }
-}
 
