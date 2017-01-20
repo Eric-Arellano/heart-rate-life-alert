@@ -17,7 +17,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let healthStore = HKHealthStore()
     var location = CLLocation()
     var heartRateTimer = Timer()
-    var inDanger = false
     
     @IBOutlet weak var contactPreference: UISwitch!
     @IBOutlet weak var emergencyName: UITextField!
@@ -189,8 +188,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
             // if kill, check for false positive
             if(responseString=="Overdose." || responseString=="Fake kill."){
-                self.inDanger = true
-                self.confirmNotFalsePositive()
+                if (self.confirmInDanger()) {
+                    self.triggerMasterKill()
+                }
             }
         }
         task.resume()
@@ -198,42 +198,49 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
     // ---------------------------------------------------------------------
-    // Kill/overdose
+    // Check false positive
     // ---------------------------------------------------------------------
     
-    func confirmNotFalsePositive() {
+    var inDanger = Bool()
+    
+    func confirmInDanger() -> Bool {
         let alertController = UIAlertController(title: "Are you ok?",
                                                 message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds",
                                                 preferredStyle: .alert)
         
         let action = UIAlertAction(title: "I am ok",
                                    style: .default,
-                                   handler: self.markInDangerFalse)
+                                   handler: self.markFalseNegative)
         alertController.addAction(action)
         DispatchQueue.main.async {
             self.present(alertController,
                          animated: true,
                          completion: nil)
-            _ = Timer.scheduledTimer(timeInterval: 30.0,
+            _ = Timer.scheduledTimer(timeInterval: 20.0,
                                      target: self,
-                                     selector: #selector(self.triggerMasterKill),
+                                     selector: #selector(self.markInDanger),
                                      userInfo: nil,
                                      repeats: false)
         }
-        
+        return inDanger
     }
-
     
-    func markInDangerFalse(alert: UIAlertAction!){
+    func markFalseNegative(alert: UIAlertAction!) {
         inDanger = false
     }
     
+    func markInDanger() {
+        inDanger = true
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Kill/overdose
+    // ---------------------------------------------------------------------
     
     func triggerMasterKill(){
-        if(inDanger==true){
-            let json: [String: Any] = ["master-kill": "master-kill"]
-            self.postJSON(message: json, suffix: "master-kill")
-        }
+        let json: [String: Any] = ["master-kill": "master-kill"]
+        self.postJSON(message: json, suffix: "master-kill")
     }
 
     
