@@ -67,8 +67,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     //Called with every press of main button
     @IBAction func startMonitoring(_ sender: UIButton) {
         trackingEnabled = true
-        postJSON(message: getContactInfo(), suffix: "contact-info")
-        postJSON(message: getLatLong(), suffix: "location")
+        postJSON(message: getContactInfo(),
+                 suffix: "contact-info")
+        postJSON(message: getLatLong(),
+                 suffix: "location")
         notifyContactOfMonitoring()
         createHeartRateTimer()
     }
@@ -85,7 +87,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func createHeartRateTimer() {
         timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(getAndPostHeartRate), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 5.0,
+                                     target: self,
+                                     selector: #selector(getAndPostHeartRate),
+                                     userInfo: nil,
+                                     repeats: true)
     }
     
     func getAndPostHeartRate(){
@@ -187,13 +193,23 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             print("responseString = \(responseString!)")
             if(responseString=="Overdose." || responseString=="Fake kill."){
                 self.inDanger = true
-                let alertController = UIAlertController(title: "Are you ok?", message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds", preferredStyle: .alert)
+                let alertController = UIAlertController(title: "Are you ok?",
+                                                        message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds",
+                                                        preferredStyle: .alert)
                 
-                let action = UIAlertAction(title: "I am ok", style: .default, handler: self.markInDangerFalse)
+                let action = UIAlertAction(title: "I am ok",
+                                           style: .default,
+                                           handler: self.markInDangerFalse)
                 alertController.addAction(action)
                 DispatchQueue.main.async {
-                    self.present(alertController, animated: true, completion: nil)
-                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(self.triggerMasterKill), userInfo: nil, repeats: false)
+                    self.present(alertController,
+                                 animated: true,
+                                 completion: nil)
+                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0,
+                                                       target: self,
+                                                       selector: #selector(self.triggerMasterKill),
+                                                       userInfo: nil,
+                                                       repeats: false)
                 }
 
                 
