@@ -153,12 +153,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let name = emergencyName.text
         let number = emergencyNumber.text
         let cause = contactCause.text
-        var preference = ""
-        if (contactPreference.isOn) {
-            preference = "text"
-        } else {
-            preference = "call"
-        }
+        let preference = "" + (contactPreference.isOn ? "text" : "call")
         return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
     }
     
