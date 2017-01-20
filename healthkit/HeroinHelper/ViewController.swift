@@ -99,14 +99,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         var cvsDict: [String: Any] = [:]
         if (HKHealthStore.isHealthDataAvailable()){
             self.healthStore.requestAuthorization(toShare: nil, read:[heartRateType], completion:{(success, error) in
-                let sortByTime = NSSortDescriptor(key:HKSampleSortIdentifierEndDate, ascending:false)
-                let timeFormatter = DateFormatter()
-                timeFormatter.dateFormat = "hh:mm:ss"
+                let sortByTime = self.createSortByTime()
+                let timeFormatter = self.createTimeFormatter()
+                let dateFormatter = self.createDateFormatter()
                 
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "MM/dd/YYYY"
-                
-                let query = HKSampleQuery(sampleType:heartRateType, predicate:nil, limit:1, sortDescriptors:[sortByTime], resultsHandler:{(query, results, error) in
+                let query = HKSampleQuery(sampleType:heartRateType,
+                                          predicate:nil,
+                                          limit:1,
+                                          sortDescriptors:[sortByTime],
+                                          resultsHandler:{(query, results, error) in
                     guard let results = results else { return }
                     for quantitySample in results {
                         let quantity = (quantitySample as! HKQuantitySample).quantity
@@ -123,6 +124,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
+    func createSortByTime() -> NSSortDescriptor {
+        return NSSortDescriptor(key:HKSampleSortIdentifierEndDate, ascending:false)
+    }
+    
+    func createTimeFormatter() -> DateFormatter {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm:ss"
+        return dateFormatter
+    }
+    
+    func createDateFormatter() -> DateFormatter {
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "MM/dd/YYYY"
+        return timeFormatter
+    }
     
     // ---------------------------------------------------------------------
     // Location
