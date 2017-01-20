@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		44E3EF471E32D1A700EED2D7 /* HttpRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E3EF461E32D1A700EED2D7 /* HttpRequests.swift */; };
 		6D9DE6F11E2A1C5C00EC5504 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9DE6F01E2A1C5C00EC5504 /* AppDelegate.swift */; };
 		6D9DE6F31E2A1C5C00EC5504 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9DE6F21E2A1C5C00EC5504 /* ViewController.swift */; };
 		6D9DE6F61E2A1C5C00EC5504 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D9DE6F41E2A1C5C00EC5504 /* Main.storyboard */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		44E3EF461E32D1A700EED2D7 /* HttpRequests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HttpRequests.swift; path = ../HttpRequests.swift; sourceTree = "<group>"; };
 		6D9DE6ED1E2A1C5C00EC5504 /* HeroinHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HeroinHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D9DE6F01E2A1C5C00EC5504 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6D9DE6F21E2A1C5C00EC5504 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 		6D9DE6EF1E2A1C5C00EC5504 /* HeroinHelper */ = {
 			isa = PBXGroup;
 			children = (
+				44E3EF461E32D1A700EED2D7 /* HttpRequests.swift */,
 				6D9DE71E1E2A988300EC5504 /* HeroinHelper.entitlements */,
 				6D9DE6F01E2A1C5C00EC5504 /* AppDelegate.swift */,
 				6D9DE6F21E2A1C5C00EC5504 /* ViewController.swift */,
@@ -279,6 +282,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44E3EF471E32D1A700EED2D7 /* HttpRequests.swift in Sources */,
 				6D9DE6F31E2A1C5C00EC5504 /* ViewController.swift in Sources */,
 				6D9DE6F11E2A1C5C00EC5504 /* AppDelegate.swift in Sources */,
 			);
@@ -529,6 +533,7 @@
 				6D9DE7171E2A1C5D00EC5504 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6D9DE7181E2A1C5D00EC5504 /* Build configuration list for PBXNativeTarget "HeroinHelperTests" */ = {
 			isa = XCConfigurationList;
@@ -537,6 +542,7 @@
 				6D9DE71A1E2A1C5D00EC5504 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6D9DE71B1E2A1C5D00EC5504 /* Build configuration list for PBXNativeTarget "HeroinHelperUITests" */ = {
 			isa = XCConfigurationList;
@@ -545,6 +551,7 @@
 				6D9DE71D1E2A1C5D00EC5504 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

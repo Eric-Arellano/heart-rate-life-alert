@@ -67,9 +67,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     //Called with every press of main button
     @IBAction func startMonitoring(_ sender: UIButton) {
         monitoringActivated = true
-        postJSON(json: getContactInfo(),
+        HTTPRequests.postJSON(json: getContactInfo(),
                  suffix: "contact-info")
-        postJSON(json: getLatLong(),
+        HTTPRequests.postJSON(json: getLatLong(),
                  suffix: "location")
         notifyContactOfMonitoring()
         createHeartRateTimer()
@@ -77,7 +77,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func notifyContactOfMonitoring(){
         let json: [String: Any] = ["start-monitoring": "start-monitoring"]
-        postJSON(json: json, suffix: "start-monitoring")
+        HTTPRequests.postJSON(json: json, suffix: "start-monitoring")
     }
     
  
@@ -113,7 +113,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     guard let results = results else { return }
                     for quantitySample in results {
                         let heartRate = self.parseHeartRate(result: quantitySample)
-                        self.postJSON(json: heartRate, suffix: "hr")
+                        let responseString = HTTPRequests.postJSON(json: heartRate, suffix: "hr")
+                        self.interpretResponseStringToTriggerKill(responseString: responseString)
                     }
                 })
                 self.healthStore.execute(query)
@@ -180,56 +181,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
     // ---------------------------------------------------------------------
-    // HTTP requests
-    // ---------------------------------------------------------------------
-
-    func postJSON(json: [String: Any], suffix: String){
-        let request = setupRequest(json: json, suffix: suffix)
-        sendRequest(request: request)
-    }
-    
-    func setupRequest(json: [String: Any], suffix: String) -> URLRequest {
-        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
-        request.httpMethod = "POST"
-        let postedJSON = try? JSONSerialization.data(withJSONObject: json)
-        request.httpBody = postedJSON
-        return request
-    }
-    
-    func sendRequest(request: URLRequest) {
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            self.checkNetworkingErrors(data: data!, error: error!)
-            self.checkHTTPErrors(response: response!)
-            let responseString = self.getResponseString(data: data!)
-            
-            // check response string for overdose
-            self.interpretResponseStringToTriggerKill(responseString: responseString)
-        }
-        task.resume()
-
-    }
-    
-    func checkNetworkingErrors(data: Data?, error: Error?) {
-        guard let _ = data, error == nil else {
-            print("error=\(error)")
-            return
-        }
-
-    }
-    
-    func checkHTTPErrors(response: URLResponse) {
-        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-            print("statusCode should be 200, but is \(httpStatus.statusCode)")
-            print("response = \(response)")
-        }
-    }
-    
-    func getResponseString(data: Data) -> String {
-        return String(data: data, encoding: .utf8)!
-    }
-    
-    
-    // ---------------------------------------------------------------------
     // Check safe heart rate
     // ---------------------------------------------------------------------
     
@@ -285,7 +236,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func triggerMasterKill(){
         let json: [String: Any] = ["master-kill": "master-kill"]
-        self.postJSON(json: json, suffix: "master-kill")
+        HTTPRequests.postJSON(json: json, suffix: "master-kill")
     }
 
     
@@ -317,7 +268,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func notifyServerStopMonitoring() {
         let json: [String: Any] = ["stop": "stop"]
-        postJSON(json: json, suffix: "stop-app")
+        HTTPRequests.postJSON(json: json, suffix: "stop-app")
     }
 
 }
