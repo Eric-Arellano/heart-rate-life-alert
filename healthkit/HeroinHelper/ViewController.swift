@@ -48,7 +48,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     //Calls this function when the tap is recognized.
     func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
     
@@ -136,9 +135,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
 
     
-    // TODO: what does this do?
+    //Get first location (most recent, relevant one) whenever location is updated
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        //Get first location (most recent, relevant one) whenever location is updated
         location = locations[0]
     }
     
@@ -260,13 +258,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     
     @IBAction func stopMonitoring(_ sender: UIButton) {
-        if(trackingEnabled==true){
-            //Stop updating of Heart Rate
-            heartRateTimer.invalidate()
-            //Tell server to Stop
-            let json: [String: Any] = ["stop": "stop"]
-            postJSON(message: json, suffix: "stop-app")
-        }else{
+        if (trackingEnabled==true) {
+            stopHeartRateTimer()
+            notifyServerStopMonitoring()
+            } else {
             trackingEnabled = false
         }
     }
@@ -275,6 +270,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         heartRateTimer.invalidate()
     }
     
+    func notifyServerStopMonitoring() {
+        let json: [String: Any] = ["stop": "stop"]
+        postJSON(message: json, suffix: "stop-app")
+    }
 
 }
 
