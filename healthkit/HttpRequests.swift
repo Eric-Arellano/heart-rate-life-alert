@@ -2,9 +2,9 @@ import Foundation
 
 class HTTPRequests {
     
-    static func postJSON(json: [String: Any], suffix: String) -> String {
+    static func postJSON(json: [String: Any], suffix: String) {
         let request = setupRequest(json: json, suffix: suffix)
-        return sendRequest(request: request)
+        sendRequest(request: request)
     }
     
     private static func setupRequest(json: [String: Any], suffix: String) -> URLRequest {
@@ -15,15 +15,13 @@ class HTTPRequests {
         return request
     }
     
-    private static func sendRequest(request: URLRequest) -> String {
-        var responseString = String()
+    private static func sendRequest(request: URLRequest) {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             self.checkNetworkingErrors(data: data!, error: error!)
             self.checkHTTPErrors(response: response!)
-            responseString = self.getResponseString(data: data!)
+            print(self.getResponseString(data: data!))
         }
         task.resume()
-        return responseString
     }
     
     private static func checkNetworkingErrors(data: Data?, error: Error?) {
