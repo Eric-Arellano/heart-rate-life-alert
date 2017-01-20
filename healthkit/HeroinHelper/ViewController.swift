@@ -186,8 +186,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             print("responseString = \(responseString!)")
             
             
-            // if kill, check for false positive
-            if(responseString=="Overdose." || responseString=="Fake kill."){
+            // if kill, check for overdose
+            if(responseString=="Overdose."){
                 if (self.confirmInDanger()) {
                     self.triggerMasterKill()
                 }
@@ -244,12 +244,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
 
     
-    @IBAction func kill(_ sender: UIButton) {
+    @IBAction func triggerSimulatedKill(_ sender: UIButton) {
         if(trackingEnabled==true) {
-            //Send POST that server knows is a fake kill
-            //For demonstration purposes, pretend HR is -1
-            let json: [String: Any] = ["heart_rate": "-1"]
-            postJSON(message: json, suffix: "fake-kill")
+            triggerMasterKill()
         } else {
             trackingEnabled = false
         }

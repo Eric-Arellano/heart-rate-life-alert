@@ -53,15 +53,6 @@ def get_hr():
     return "HR okay."
 
 
-@app.route('/fake-kill', methods=['GET', 'POST'])
-def fake_kill():
-    parsed = extract_json(request.form)
-    heart_rate = parsed['heart_rate']
-    if is_fake_kill(heart_rate):
-        return "Fake kill."
-    return "Fake kill not triggered."
-
-
 @app.route('/master-kill', methods=['GET', 'POST'])
 def master_kill():
     response.trigger_response()
