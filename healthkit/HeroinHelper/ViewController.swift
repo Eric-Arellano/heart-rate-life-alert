@@ -29,24 +29,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
     // ---------------------------------------------------------------------
-    // UI
+    // Setup / UI
     // ---------------------------------------------------------------------
 
     
     override func viewDidLoad() {
-        //Set up necessary location manager handling
         super.viewDidLoad()
+        setUpLocationMangager()
+        dismissKeyboardOnTap()
+    }
+    
+    func setUpLocationMangager() {
         locManager.delegate = self
         locManager.desiredAccuracy = kCLLocationAccuracyBest
         locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         locManager.requestAlwaysAuthorization()
-        //Dismiss keyboard by tapping off of it
+    }
+
+    func dismissKeyboardOnTap() {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
     
-    //Calls this function when the tap is recognized.
     func dismissKeyboard() {
         view.endEditing(true)
     }
