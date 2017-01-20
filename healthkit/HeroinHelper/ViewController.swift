@@ -85,6 +85,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // Heart rate
     // ---------------------------------------------------------------------
     
+    // standard heart rate values
+    let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
+    let sortByTime = ViewController.createSortByTime()
+    let timeFormatter = ViewController.createTimeFormatter()
+    let dateFormatter = ViewController.createDateFormatter()
+    
     func createHeartRateTimer() {
         heartRateTimer.invalidate()
         heartRateTimer = Timer.scheduledTimer(timeInterval: 5.0,
@@ -94,29 +100,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                                      repeats: true)
     }
     
+
     func getAndPostHeartRate(){
-        let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
-        var cvsDict: [String: Any] = [:]
         if (HKHealthStore.isHealthDataAvailable()){
             self.healthStore.requestAuthorization(toShare: nil, read:[heartRateType], completion:{(success, error) in
-                let sortByTime = self.createSortByTime()
-                let timeFormatter = self.createTimeFormatter()
-                let dateFormatter = self.createDateFormatter()
                 
-                let query = HKSampleQuery(sampleType:heartRateType,
+                let query = HKSampleQuery(sampleType:self.heartRateType,
                                           predicate:nil,
                                           limit:1,
-                                          sortDescriptors:[sortByTime],
+                                          sortDescriptors:[self.sortByTime],
                                           resultsHandler:{(query, results, error) in
                     guard let results = results else { return }
                     for quantitySample in results {
-                        let quantity = (quantitySample as! HKQuantitySample).quantity
-                        let time = timeFormatter.string(from: quantitySample.startDate)
-                        let date = dateFormatter.string(from: quantitySample.startDate)
-                        let heartRateUnit = HKUnit(from: "count/min")
-                        let heartRate = quantity.doubleValue(for: heartRateUnit)
-                        cvsDict = ["time": time, "date": date, "heart_rate": heartRate]
-                        self.postJSON(json: cvsDict, suffix: "hr")
+                        let heartRate = self.parseHeartRate(result: quantitySample)
+                        self.postJSON(json: heartRate, suffix: "hr")
                     }
                 })
                 self.healthStore.execute(query)
@@ -124,17 +121,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func createSortByTime() -> NSSortDescriptor {
+    func parseHeartRate(result: HKSample) -> [String: Any] {
+        let quantity = (result as! HKQuantitySample).quantity
+        let time = timeFormatter.string(from: result.startDate)
+        let date = dateFormatter.string(from: result.startDate)
+        let heartRateUnit = HKUnit(from: "count/min")
+        let heartRate = quantity.doubleValue(for: heartRateUnit)
+        return ["time": time, "date": date, "heart_rate": heartRate]
+    }
+    
+    static func createSortByTime() -> NSSortDescriptor {
         return NSSortDescriptor(key:HKSampleSortIdentifierEndDate, ascending:false)
     }
     
-    func createTimeFormatter() -> DateFormatter {
+    static func createTimeFormatter() -> DateFormatter {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm:ss"
         return dateFormatter
     }
     
-    func createDateFormatter() -> DateFormatter {
+    static func createDateFormatter() -> DateFormatter {
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "MM/dd/YYYY"
         return timeFormatter
