@@ -185,26 +185,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
             let responseString = String(data: data, encoding: .utf8)
             print("responseString = \(responseString!)")
+            
+            
+            // if kill, check for false positive
             if(responseString=="Overdose." || responseString=="Fake kill."){
                 self.inDanger = true
-                let alertController = UIAlertController(title: "Are you ok?",
-                                                        message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds",
-                                                        preferredStyle: .alert)
-                
-                let action = UIAlertAction(title: "I am ok",
-                                           style: .default,
-                                           handler: self.markInDangerFalse)
-                alertController.addAction(action)
-                DispatchQueue.main.async {
-                    self.present(alertController,
-                                 animated: true,
-                                 completion: nil)
-                    _ = Timer.scheduledTimer(timeInterval: 30.0,
-                                                       target: self,
-                                                       selector: #selector(self.triggerMasterKill),
-                                                       userInfo: nil,
-                                                       repeats: false)
-                }
+                self.confirmNotFalsePositive()
             }
         }
         task.resume()
@@ -214,6 +200,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     // Kill/overdose
     // ---------------------------------------------------------------------
+    
+    func confirmNotFalsePositive() {
+        let alertController = UIAlertController(title: "Are you ok?",
+                                                message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds",
+                                                preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "I am ok",
+                                   style: .default,
+                                   handler: self.markInDangerFalse)
+        alertController.addAction(action)
+        DispatchQueue.main.async {
+            self.present(alertController,
+                         animated: true,
+                         completion: nil)
+            _ = Timer.scheduledTimer(timeInterval: 30.0,
+                                     target: self,
+                                     selector: #selector(self.triggerMasterKill),
+                                     userInfo: nil,
+                                     repeats: false)
+        }
+        
+    }
+
     
     func markInDangerFalse(alert: UIAlertAction!){
         inDanger = false
