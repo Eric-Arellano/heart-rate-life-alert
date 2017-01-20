@@ -95,13 +95,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         heartRateTimer.invalidate()
         heartRateTimer = Timer.scheduledTimer(timeInterval: 5.0,
                                      target: self,
-                                     selector: #selector(getAndPostHeartRate),
+                                     selector: #selector(getAndCheckHeartRate),
                                      userInfo: nil,
                                      repeats: true)
     }
     
 
-    func getAndPostHeartRate(){
+    func getAndCheckHeartRate(){
+        let heartRateJSON = getHeartRate()
+        let heartRate = heartRateJSON["heart_rate"]
+        if (isOverdose(heartRate: heartRate as! Int)) {
+            if (self.confirmInDanger()) {
+                self.triggerMasterKill()
+            }
+        }
+    }
+    
+    func getHeartRate() -> [String: Any] {
+        var heartRate = [String: Any]()
         if (HKHealthStore.isHealthDataAvailable()){
             self.healthStore.requestAuthorization(toShare: nil, read:[heartRateType], completion:{(success, error) in
                 
@@ -110,16 +121,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                                           limit:1,
                                           sortDescriptors:[self.sortByTime],
                                           resultsHandler:{(query, results, error) in
-                    guard let results = results else { return }
-                    for quantitySample in results {
-                        let heartRate = self.parseHeartRate(result: quantitySample)
-                        let responseString = HTTPRequests.postJSON(json: heartRate, suffix: "hr")
-                        self.interpretResponseStringToTriggerKill(responseString: responseString)
-                    }
+                                            guard let results = results else { return }
+                                            for quantitySample in results {
+                                                heartRate = self.parseHeartRate(result: quantitySample)
+                                            }
                 })
                 self.healthStore.execute(query)
             })
         }
+        return heartRate
     }
     
     func parseHeartRate(result: HKSample) -> [String: Any] {
@@ -183,6 +193,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     // Check safe heart rate
     // ---------------------------------------------------------------------
+    
+    func isOverdose(heartRate: Int) -> Bool {
+        return heartRate > 180 ? true : false
+    }
     
     func interpretResponseStringToTriggerKill(responseString: String) {
         if(responseString=="Overdose."){
