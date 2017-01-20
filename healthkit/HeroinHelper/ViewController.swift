@@ -67,10 +67,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     //Called with every press of main button
     @IBAction func startMonitoring(_ sender: UIButton) {
         trackingEnabled = true
-        getAndPostContactInfo()
-        getAndPostLatLong()
+        postJSON(message: getContactInfo(), suffix: "contact-info")
+        postJSON(message: getLatLong(), suffix: "location")
         notifyContactOfMonitoring()
         createHeartRateTimer()
+    }
+    
+    func notifyContactOfMonitoring(){
+        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
+        postJSON(message: json, suffix: "start-monitoring")
     }
     
  
@@ -116,11 +121,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     // Location
     // ---------------------------------------------------------------------
-
-    func getAndPostLatLong(){
-        let locationJSON = getLatLong()
-        postJSON(message: locationJSON, suffix: "location")
-    }
     
     func getLatLong() -> [String: Any] {
         let currentLocation = locManager.location
@@ -143,29 +143,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // Contact info
     // ---------------------------------------------------------------------
     
-    func getAndPostContactInfo(){
-        let contactInfoJSON = getContactInfo()
-        postJSON(message: contactInfoJSON, suffix: "contact-info")
-    }
-    
     func getContactInfo() -> [String: Any] {
         let name = emergencyName.text
         let number = emergencyNumber.text
         let cause = contactCause.text
         var preference = ""
-        if(contactPreference.isOn) {
+        if (contactPreference.isOn) {
             preference = "text"
         } else {
             preference = "call"
         }
         return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
     }
-    
-    func notifyContactOfMonitoring(){
-        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
-        postJSON(message: json, suffix: "start-monitoring")
-    }
-    
     
     
     // ---------------------------------------------------------------------
