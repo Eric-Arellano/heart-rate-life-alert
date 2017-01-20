@@ -161,7 +161,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // HTTP requests
     // ---------------------------------------------------------------------
 
-
     func postJSON(json: [String: Any], suffix: String){
         let request = setupRequest(json: json, suffix: suffix)
         sendRequest(request: request)
@@ -177,25 +176,40 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func sendRequest(request: URLRequest) {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            //check for networking errors
-            guard let data = data, error == nil else {
-                print("error=\(error)")
-                return
-            }
-            //check for http errors
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-            }
-            // get response string
-            let responseString = String(data: data, encoding: .utf8)
-            print("responseString = \(responseString!)")
+            self.checkNetworkingErrors(data: data!, error: error!)
+            self.checkHTTPErrors(response: response!)
+            let responseString = self.getResponseString(data: data!)
+            
             // check response string for overdose
-            self.interpretResponseStringToTriggerKill(responseString: responseString!)
+            self.interpretResponseStringToTriggerKill(responseString: responseString)
         }
         task.resume()
 
     }
+    
+    func checkNetworkingErrors(data: Data?, error: Error?) {
+        guard let _ = data, error == nil else {
+            print("error=\(error)")
+            return
+        }
+
+    }
+    
+    func checkHTTPErrors(response: URLResponse) {
+        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+            print("statusCode should be 200, but is \(httpStatus.statusCode)")
+            print("response = \(response)")
+        }
+    }
+    
+    func getResponseString(data: Data) -> String {
+        return String(data: data, encoding: .utf8)!
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Check safe heart rate
+    // ---------------------------------------------------------------------
     
     func interpretResponseStringToTriggerKill(responseString: String) {
         if(responseString=="Overdose."){
