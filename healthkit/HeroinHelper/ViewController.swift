@@ -17,7 +17,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let healthStore = HKHealthStore()
     var location = CLLocation()
     var heartRateTimer = Timer()
-    var alertTimer = Timer()
     var inDanger = false
     
     @IBOutlet weak var contactPreference: UISwitch!
@@ -200,14 +199,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     self.present(alertController,
                                  animated: true,
                                  completion: nil)
-                    self.alertTimer = Timer.scheduledTimer(timeInterval: 30.0,
+                    _ = Timer.scheduledTimer(timeInterval: 30.0,
                                                        target: self,
                                                        selector: #selector(self.triggerMasterKill),
                                                        userInfo: nil,
                                                        repeats: false)
                 }
-
-                
             }
         }
         task.resume()
