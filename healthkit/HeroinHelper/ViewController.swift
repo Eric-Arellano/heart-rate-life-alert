@@ -118,19 +118,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
 
     func getAndPostLatLong(){
-        //Get location -> convert that to numbers -> then to String for passing to POST
+        let locationJSON = getLatLong()
+        postJSON(message: locationJSON, suffix: "location")
+    }
+    
+    func getLatLong() -> [String: Any] {
         let currentLocation = locManager.location
         let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
         let latitude_numeric = NSNumber(value: currentLocation!.coordinate.latitude)
         let longitude = longitude_numeric.stringValue
         let latitude = latitude_numeric.stringValue
-        
-        //Make the actual request
-        let json: [String: Any] = ["latitude": latitude, "longitude": longitude]
-        postJSON(message: json, suffix: "location")
+        return ["latitude": latitude, "longitude": longitude]
     }
 
     
+    // TODO: what does this do?
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         //Get first location (most recent, relevant one) whenever location is updated
         location = locations[0]
@@ -142,17 +144,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     
     func getAndPostContactInfo(){
+        let contactInfoJSON = getContactInfo()
+        postJSON(message: contactInfoJSON, suffix: "contact-info")
+    }
+    
+    func getContactInfo() -> [String: Any] {
         let name = emergencyName.text
         let number = emergencyNumber.text
         let cause = contactCause.text
         var preference = ""
-        if(contactPreference.isOn){
+        if(contactPreference.isOn) {
             preference = "text"
-        }else{
+        } else {
             preference = "call"
         }
-        let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
-        postJSON(message: json, suffix: "contact-info")
+        return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
     }
     
     func notifyContactOfMonitoring(){
