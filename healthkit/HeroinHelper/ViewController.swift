@@ -163,9 +163,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
 
     func postJSON(json: [String: Any], suffix: String){
-        let request = self.setupRequest(json: json, suffix: suffix)
-        
-        //Run task that calls the actual POST
+        let request = setupRequest(json: json, suffix: suffix)
+        sendRequest(request: request)
+    }
+    
+    func setupRequest(json: [String: Any], suffix: String) -> URLRequest {
+        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
+        request.httpMethod = "POST"
+        let postedJSON = try? JSONSerialization.data(withJSONObject: json)
+        request.httpBody = postedJSON
+        return request
+    }
+    
+    func sendRequest(request: URLRequest) {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             //check for networking errors
             guard let data = data, error == nil else {
@@ -174,7 +184,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }
             //check for http errors
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-               print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("statusCode should be 200, but is \(httpStatus.statusCode)")
                 print("response = \(response)")
             }
             // get response string
@@ -184,14 +194,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             self.interpretResponseStringToTriggerKill(responseString: responseString!)
         }
         task.resume()
-    }
-    
-    func setupRequest(json: [String: Any], suffix: String) -> URLRequest {
-        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
-        request.httpMethod = "POST"
-        let postedJSON = try? JSONSerialization.data(withJSONObject: json)
-        request.httpBody = postedJSON
-        return request
+
     }
     
     func interpretResponseStringToTriggerKill(responseString: String) {
