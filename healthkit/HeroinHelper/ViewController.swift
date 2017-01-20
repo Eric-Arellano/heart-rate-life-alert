@@ -13,25 +13,23 @@ import HealthKit
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 
-    var locManager = CLLocationManager()
-    let healthStore = HKHealthStore()
+    var monitoringActivated = false
+    
+    var locationManager = CLLocationManager()
     var location = CLLocation()
+    let healthStore = HKHealthStore()
     var heartRateTimer = Timer()
     
+    @IBOutlet weak var mainLabel: UILabel!
     @IBOutlet weak var contactPreference: UISwitch!
     @IBOutlet weak var emergencyName: UITextField!
     @IBOutlet weak var emergencyNumber: UITextField!
     @IBOutlet weak var contactCause: UITextField!
     
-    @IBOutlet weak var mainLabel: UILabel!
-    var count = 0
-    var trackingEnabled = false
-    
     
     // ---------------------------------------------------------------------
     // Setup / UI
     // ---------------------------------------------------------------------
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,11 +38,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func setUpLocationMangager() {
-        locManager.delegate = self
-        locManager.desiredAccuracy = kCLLocationAccuracyBest
-        locManager.requestWhenInUseAuthorization()
-        locManager.startUpdatingLocation()
-        locManager.requestAlwaysAuthorization()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
+        locationManager.requestAlwaysAuthorization()
     }
 
     func dismissKeyboardOnTap() {
@@ -68,7 +66,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     //Called with every press of main button
     @IBAction func startMonitoring(_ sender: UIButton) {
-        trackingEnabled = true
+        monitoringActivated = true
         postJSON(message: getContactInfo(),
                  suffix: "contact-info")
         postJSON(message: getLatLong(),
@@ -131,7 +129,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     
     func getLatLong() -> [String: Any] {
-        let currentLocation = locManager.location
+        let currentLocation = locationManager.location
         let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
         let latitude_numeric = NSNumber(value: currentLocation!.coordinate.latitude)
         let longitude = longitude_numeric.stringValue
@@ -250,10 +248,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     
     @IBAction func triggerSimulatedKill(_ sender: UIButton) {
-        if(trackingEnabled==true) {
+        if(monitoringActivated == true) {
             triggerMasterKill()
         } else {
-            trackingEnabled = false
+            monitoringActivated = false
         }
     }
     
@@ -263,11 +261,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // ---------------------------------------------------------------------
     
     @IBAction func stopMonitoring(_ sender: UIButton) {
-        if (trackingEnabled==true) {
+        if (monitoringActivated == true) {
             stopHeartRateTimer()
             notifyServerStopMonitoring()
             } else {
-            trackingEnabled = false
+            monitoringActivated = false
         }
     }
     
