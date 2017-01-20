@@ -181,19 +181,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                print("statusCode should be 200, but is \(httpStatus.statusCode)")
                 print("response = \(response)")
             }
-            
+            // get response string
             let responseString = String(data: data, encoding: .utf8)
             print("responseString = \(responseString!)")
-            
-            
-            // if kill, check for overdose
-            if(responseString=="Overdose."){
-                if (self.confirmInDanger()) {
-                    self.triggerMasterKill()
-                }
-            }
+            // check response string for overdose
+            self.interpretResponseStringToTriggerKill(responseString: responseString!)
         }
         task.resume()
+    }
+    
+    func interpretResponseStringToTriggerKill(responseString: String) {
+        if(responseString=="Overdose."){
+            if (self.confirmInDanger()) {
+                self.triggerMasterKill()
+            }
+        }
     }
     
     
