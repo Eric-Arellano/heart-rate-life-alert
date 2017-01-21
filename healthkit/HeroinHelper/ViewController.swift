@@ -2,13 +2,11 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController {
 
     var monitoringActivated = false
-    
-    var locationManager = CLLocationManager()
-    var location = CLLocation()
     var heartRateTimer = Timer()
+    var locationManager = Location()
     
     @IBOutlet weak var mainLabel: UILabel!
     @IBOutlet weak var contactPreference: UISwitch!
@@ -23,16 +21,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpLocationMangager()
+        locationManager.setUpLocationMangager()
         dismissKeyboardOnTap()
-    }
-    
-    func setUpLocationMangager() {
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
-        locationManager.requestAlwaysAuthorization()
     }
 
     func dismissKeyboardOnTap() {
@@ -59,7 +49,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             monitoringActivated = true
             HTTPRequests.postJSON(json: getContactInfo(),
                                   suffix: "contact-info")
-            HTTPRequests.postJSON(json: getLatLong(),
+            HTTPRequests.postJSON(json: locationManager.getLatLong(),
                                   suffix: "location")
             notifyContactOfMonitoring()
             createHeartRateTimer()
@@ -72,7 +62,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         HTTPRequests.postJSON(json: json, suffix: "start-monitoring")
     }
     
- 
+    
+    // ---------------------------------------------------------------------
+    // Get contact info
+    // ---------------------------------------------------------------------
+    
+    func getContactInfo() -> [String: Any] {
+        let name = emergencyName.text
+        let number = emergencyNumber.text
+        let cause = contactCause.text
+        let preference = "" + (contactPreference.isOn ? "text" : "call")
+        return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
+    }
+
+    
     // ---------------------------------------------------------------------
     // Heart rate
     // ---------------------------------------------------------------------
@@ -94,38 +97,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 self.triggerMasterKill()
             }
         }
-    }
-    
-    // ---------------------------------------------------------------------
-    // Location
-    // ---------------------------------------------------------------------
-    
-    func getLatLong() -> [String: Any] {
-        let currentLocation = locationManager.location
-        let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
-        let latitude_numeric = NSNumber(value: currentLocation!.coordinate.latitude)
-        let longitude = longitude_numeric.stringValue
-        let latitude = latitude_numeric.stringValue
-        return ["latitude": latitude, "longitude": longitude]
-    }
-
-    
-    //Get first location (most recent, relevant one) whenever location is updated
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        location = locations[0]
-    }
-    
-    
-    // ---------------------------------------------------------------------
-    // Contact info
-    // ---------------------------------------------------------------------
-    
-    func getContactInfo() -> [String: Any] {
-        let name = emergencyName.text
-        let number = emergencyNumber.text
-        let cause = contactCause.text
-        let preference = "" + (contactPreference.isOn ? "text" : "call")
-        return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
     }
     
     

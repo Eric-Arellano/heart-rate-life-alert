@@ -3,13 +3,13 @@ import Foundation
 import MapKit
 import CoreLocation
 
-class Location {
+class Location: NSObject, CLLocationManagerDelegate {
     
     var locationManager = CLLocationManager()
     var location = CLLocation()
     
     func setUpLocationMangager() {
-        locationManager.delegate = 
+        locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
@@ -31,5 +31,5 @@ class Location {
         location = locations[0]
     }
     
-
+    
 }
