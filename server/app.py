@@ -2,7 +2,6 @@ import simplejson as json
 from flask import Flask, current_app
 from flask import request
 
-from interpreter import is_simple_overdose, is_fake_kill
 from response import Response
 
 app = Flask(__name__)

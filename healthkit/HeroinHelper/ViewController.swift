@@ -94,8 +94,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func getAndCheckHeartRate(){
         let heartRateJSON = HeartRate.getHeartRate()
-        let heartRate = heartRateJSON["heart_rate"]
-        if (isOverdose(heartRate: heartRate as! Int)) {
+        let heartRate = heartRateJSON["heart_rate"] as! Int
+        if (HeartRateInterpreter.isSimpleOverdose(heartRate: heartRate)) {
             if (self.confirmInDanger()) {
                 self.triggerMasterKill()
             }
@@ -132,15 +132,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let cause = contactCause.text
         let preference = "" + (contactPreference.isOn ? "text" : "call")
         return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
-    }
-    
-    
-    // ---------------------------------------------------------------------
-    // Check safe heart rate
-    // ---------------------------------------------------------------------
-    
-    func isOverdose(heartRate: Int) -> Bool {
-        return heartRate > 180 ? true : false
     }
     
     
