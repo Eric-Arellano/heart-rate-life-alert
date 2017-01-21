@@ -8,7 +8,7 @@ class HeartRateInterpreter {
         return heartRate > 180 ? true : false
     }
     
-    static func isDynamicOverdose(heartRate: Int) -> Bool {
+//    static func isDynamicOverdose(heartRate: Int) -> Bool {
 //        vari = 0
 //        diff = 0
 //        x = 200
@@ -20,6 +20,6 @@ class HeartRateInterpreter {
 //        vari += (-.1 * (len(heart_rates) - index - 18)) * (diff * diff)
 //        if (vari > x):
 //        return True
-    }
+//    }
     
 }
