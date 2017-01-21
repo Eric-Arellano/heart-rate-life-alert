@@ -1,6 +1,5 @@
-from location import create_map_url
-from twilio import send_text, start_call, generate_twiml, write_twiml_to_file
-
+import location
+import twilio
 
 class Response:
     from_number = "+15202144342"
@@ -21,7 +20,7 @@ class Response:
 
     def notify_contact_of_start(self):
         message = self.generate_start_message()
-        send_text(self.contact_number, self.from_number, message)
+        twilio.send_text(self.contact_number, self.from_number, message)
 
     def generate_start_message(self):
         return self.contact_name + ", this message is to let you know that your friend " + self.user_name + \
@@ -32,13 +31,13 @@ class Response:
     def trigger_response(self):
         message = self.generate_response()
         if self.contact_preference == 'text':
-            map_url = create_map_url(self.location)
-            send_text(self.contact_number, self.from_number, message, map_url)
+            map_url = location.create_map_url(self.location)
+            twilio.send_text(self.contact_number, self.from_number, message, map_url)
         elif self.contact_preference == 'call':
-            twiml = generate_twiml(message)
-            write_twiml_to_file(twiml, 'static/phone-script.xml')
+            twiml = twilio.generate_twiml(message)
+            twilio.write_twiml_to_file(twiml, 'static/phone-script.xml')
             script_url = 'http://172.56.17.26:8080/twiml'  # TODO: get this to permanent, working URL
-            start_call(self.contact_number, self.from_number, script_url)
+            twilio.start_call(self.contact_number, self.from_number, script_url)
 
     def generate_response(self):
         # TODO: convert lat long to address
