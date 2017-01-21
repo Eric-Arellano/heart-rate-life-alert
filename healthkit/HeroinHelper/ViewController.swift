@@ -1,11 +1,3 @@
-//
-//  ViewController.swift
-//  HeroinHelper
-//
-//  Created by Steven Sawtelle on 1/14/17.
-//  Copyright © 2017 Steven Sawtelle. All rights reserved.
-//
-
 import UIKit
 import MapKit
 import CoreLocation
