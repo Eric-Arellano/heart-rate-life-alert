@@ -54,15 +54,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // Overall start monitoring
     // ---------------------------------------------------------------------
     
-    //Called with every press of main button
     @IBAction func startMonitoring(_ sender: UIButton) {
-        monitoringActivated = true
-        HTTPRequests.postJSON(json: getContactInfo(),
-                 suffix: "contact-info")
-        HTTPRequests.postJSON(json: getLatLong(),
-                 suffix: "location")
-        notifyContactOfMonitoring()
-        createHeartRateTimer()
+        if (monitoringActivated == false) {
+            monitoringActivated = true
+            HTTPRequests.postJSON(json: getContactInfo(),
+                                  suffix: "contact-info")
+            HTTPRequests.postJSON(json: getLatLong(),
+                                  suffix: "location")
+            notifyContactOfMonitoring()
+            createHeartRateTimer()
+
+        }
     }
     
     func notifyContactOfMonitoring(){
