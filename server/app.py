@@ -7,13 +7,7 @@ from response import Response
 
 app = Flask(__name__)
 
-heart_rates = []
 response = Response()
-
-
-@app.route('/dashboard', methods=['GET'])
-def return_heart_rates():
-    return ", ".join(heart_rates)
 
 
 @app.route('/location', methods=['GET', 'POST'])
@@ -39,18 +33,6 @@ def get_contact_number():
 def start_monitoring():
     response.notify_contact_of_start()
     return "Contact notified."
-
-
-@app.route('/hr', methods=['GET', 'POST'])
-def get_hr():
-    parsed = extract_json(request.form)
-    heart_rate = parsed['heart_rate']
-    # date = parsed['date']
-    # time = parsed['time']
-    heart_rates.append(heart_rate)
-    if is_simple_overdose(heart_rate):
-        return "Overdose."
-    return "HR okay."
 
 
 @app.route('/master-kill', methods=['GET', 'POST'])

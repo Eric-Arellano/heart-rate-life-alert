@@ -9,7 +9,6 @@
 import UIKit
 import MapKit
 import CoreLocation
-import HealthKit
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 
@@ -142,14 +141,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func isOverdose(heartRate: Int) -> Bool {
         return heartRate > 180 ? true : false
-    }
-    
-    func interpretResponseStringToTriggerKill(responseString: String) {
-        if(responseString=="Overdose."){
-            if (self.confirmInDanger()) {
-                self.triggerMasterKill()
-            }
-        }
     }
     
     
