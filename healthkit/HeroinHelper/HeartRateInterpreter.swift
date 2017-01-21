@@ -2,10 +2,10 @@ import Foundation
 
 class HeartRateInterpreter {
     
-    static let overdoseHeartRate = 180
+    static let OVERDOSE_HEART_RATE = 180
     
     static func isSimpleOverdose(heartRate: Int) -> Bool {
-        return heartRate > 180 ? true : false
+        return heartRate > OVERDOSE_HEART_RATE ? true : false
     }
     
 //    static func isDynamicOverdose(heartRate: Int) -> Bool {
