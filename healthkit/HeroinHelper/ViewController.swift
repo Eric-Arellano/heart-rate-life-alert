@@ -1,218 +1,180 @@
-//
-//  ViewController.swift
-//  HeroinHelper
-//
-//  Created by Steven Sawtelle on 1/14/17.
-//  Copyright © 2017 Steven Sawtelle. All rights reserved.
-//
-
 import UIKit
-import MapKit
-import CoreLocation
-import HealthKit
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController {
 
-    var locManager = CLLocationManager()
-    let healthStore = HKHealthStore()
-    var location = CLLocation()
-    var timer = Timer()
-    var timer2 = Timer()
-    var inDanger = false
+    var monitoringActivated = false
+    var heartRateTimer = Timer()
+    var locationManager = Location()
     
+    @IBOutlet weak var mainLabel: UILabel!
     @IBOutlet weak var contactPreference: UISwitch!
     @IBOutlet weak var emergencyName: UITextField!
     @IBOutlet weak var emergencyNumber: UITextField!
     @IBOutlet weak var contactCause: UITextField!
     
-    @IBOutlet weak var mainLabel: UILabel!
-    var count = 0
-    var trackingEnabled = false
     
-    //Called with every press of main button
-    @IBAction func startMonitor(_ sender: UIButton) {
-        trackingEnabled = true
-        //Post current filled out contact info
-        postContact()
-        //Post lat long coordinates
-        sendLatLongRequest()
-        //Notify contact initially
-        notifyContactPost()
-        //Create Timer
-        timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
-        
-    }
-    
-    //
-    func notifyContactPost(){
-        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
-        makeRequest(message: json, suffix: "start-monitoring")
-    }
-    
-    @IBAction func stopMonitoring(_ sender: UIButton) {
-        if(trackingEnabled==true){
-            //Stop updating of Heart Rate
-            timer.invalidate()
-            //Tell server to Stop
-            let json: [String: Any] = ["stop": "stop"]
-            makeRequest(message: json, suffix: "stop-app")
-        }else{
-            trackingEnabled = false
-        }
-    }
-    
-    //For demonstration purposes, pretend HR is -1
-    @IBAction func kill(_ sender: UIButton) {
-        if(trackingEnabled==true){
-            //Send POST that server knows is a fake kill
-            let json: [String: Any] = ["heart_rate": "-1"]
-            makeRequest(message: json, suffix: "fake-kill")
-        }else{
-            trackingEnabled = false
-        }
-    }
+    // ---------------------------------------------------------------------
+    // Setup / UI
+    // ---------------------------------------------------------------------
     
     override func viewDidLoad() {
-        //Set up necessary location manager handling
         super.viewDidLoad()
-        locManager.delegate = self
-        locManager.desiredAccuracy = kCLLocationAccuracyBest
-        locManager.requestWhenInUseAuthorization()
-        locManager.startUpdatingLocation()
-        locManager.requestAlwaysAuthorization()
-        //Dismiss keyboard by tapping off of it
+        locationManager.setUpLocationMangager()
+        dismissKeyboardOnTap()
+    }
+
+    func dismissKeyboardOnTap() {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
-
-    //Calls this function when the tap is recognized.
+    
     func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
     
-    
-    func timerAction(){
-        //Get heart rate, post to Python Server
-        let heartRateType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!
-        var cvsDict: [String: Any] = [:]
-        if (HKHealthStore.isHealthDataAvailable()){
-            self.healthStore.requestAuthorization(toShare: nil, read:[heartRateType], completion:{(success, error) in
-                let sortByTime = NSSortDescriptor(key:HKSampleSortIdentifierEndDate, ascending:false)
-                let timeFormatter = DateFormatter()
-                timeFormatter.dateFormat = "hh:mm:ss"
-                
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "MM/dd/YYYY"
-                
-                let query = HKSampleQuery(sampleType:heartRateType, predicate:nil, limit:1, sortDescriptors:[sortByTime], resultsHandler:{(query, results, error) in
-                    guard let results = results else { return }
-                    for quantitySample in results {
-                        let quantity = (quantitySample as! HKQuantitySample).quantity
-                        let time = timeFormatter.string(from: quantitySample.startDate)
-                        let date = dateFormatter.string(from: quantitySample.startDate)
-                        let heartRateUnit = HKUnit(from: "count/min")
-                        let heartRate = quantity.doubleValue(for: heartRateUnit)
-                        cvsDict = ["time": time, "date": date, "heart_rate": heartRate]
-                        self.makeRequest(message: cvsDict, suffix: "hr")
-                    }
-                })
-                self.healthStore.execute(query)
-            })
-        }
-    }
-    
-    func sendLatLongRequest(){
-        //Get location -> convert that to numbers -> then to String for passing to POST
-        let currentLocation = locManager.location
-        let longitude_numeric = NSNumber(value: currentLocation!.coordinate.longitude)
-        let latitude_numeric = NSNumber(value: currentLocation!.coordinate.latitude)
-        let longitude = longitude_numeric.stringValue
-        let latitude = latitude_numeric.stringValue
-        
-        //Make the actual request
-        let json: [String: Any] = ["latitude": latitude, "longitude": longitude]
-        makeRequest(message: json, suffix: "location")
-    }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        //Get first location (most recent, relevant one) whenever location is updated
-        location = locations[0]
+    
+    // ---------------------------------------------------------------------
+    // Overall start monitoring
+    // ---------------------------------------------------------------------
+    
+    @IBAction func startMonitoring(_ sender: UIButton) {
+        if (monitoringActivated == false) {
+            monitoringActivated = true
+            HTTPRequests.postJSON(json: getContactInfo(),
+                                  suffix: "contact-info")
+            HTTPRequests.postJSON(json: locationManager.getLatLong(),
+                                  suffix: "location")
+            notifyContactOfMonitoring()
+            createHeartRateTimer()
+
+        }
     }
     
-    func postContact(){
+    func notifyContactOfMonitoring(){
+        let json: [String: Any] = ["start-monitoring": "start-monitoring"]
+        HTTPRequests.postJSON(json: json, suffix: "start-monitoring")
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Get contact info
+    // ---------------------------------------------------------------------
+    
+    func getContactInfo() -> [String: Any] {
         let name = emergencyName.text
         let number = emergencyNumber.text
         let cause = contactCause.text
-        var preference = ""
-        if(contactPreference.isOn){
-            preference = "text"
-        }else{
-            preference = "call"
-        }
-        let json: [String: Any] = ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
-        makeRequest(message: json, suffix: "contact-info")
+        let preference = "" + (contactPreference.isOn ? "text" : "call")
+        return ["contact_name": name, "contact_number": number, "contact_preference": preference, "contact_cause": cause]
     }
 
-    func makeRequest(message: [String: Any], suffix: String){
-        //Set up request format for interacting with Python server
-        var request = URLRequest(url: URL(string: "http://192.168.43.94:5000/"+suffix)!)
-        request.httpMethod = "POST"
-        let postedJSON = try? JSONSerialization.data(withJSONObject: message)
-        request.httpBody = postedJSON
-        
-        //Run task that calls the actual POST
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            //check for networking errors
-            guard let data = data, error == nil else {
-                print("error=\(error)")
-                return
-            }
-            //check for http errors
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-               print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-            }
-            
-            let responseString = String(data: data, encoding: .utf8)
-            print("responseString = \(responseString!)")
-            if(responseString=="Overdose." || responseString=="Fake kill."){
-                self.inDanger = true
-                let alertController = UIAlertController(title: "Are you ok?", message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds", preferredStyle: .alert)
-                
-                let action = UIAlertAction(title: "I am ok", style: .default, handler: self.markInDangerFalse)
-                alertController.addAction(action)
-                DispatchQueue.main.async {
-                    self.present(alertController, animated: true, completion: nil)
-                    self.timer2 = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(self.timer2Action), userInfo: nil, repeats: false)
-                }
-
-                
-            }
-        }
-        task.resume()
+    
+    // ---------------------------------------------------------------------
+    // Heart rate
+    // ---------------------------------------------------------------------
+    
+    func createHeartRateTimer() {
+        heartRateTimer.invalidate()
+        heartRateTimer = Timer.scheduledTimer(timeInterval: 5.0,
+                                     target: self,
+                                     selector: #selector(getAndCheckHeartRate),
+                                     userInfo: nil,
+                                     repeats: true)
     }
     
-    func markInDangerFalse(alert: UIAlertAction!){
+    func getAndCheckHeartRate(){
+        let heartRateJSON = HeartRate.getHeartRate()
+        let heartRate = heartRateJSON["heart_rate"] as! Int
+        if (HeartRateInterpreter.isSimpleOverdose(heartRate: heartRate)) {
+            if (self.confirmInDanger()) {
+                self.triggerMasterKill()
+            }
+        }
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Check false positive
+    // ---------------------------------------------------------------------
+    
+    var inDanger = Bool()
+    
+    func confirmInDanger() -> Bool {
+        let alertController = UIAlertController(title: "Are you ok?",
+                                                message:"We will contact your emergency contact with your location if you don't respond in the next 30 seconds",
+                                                preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "I am ok",
+                                   style: .default,
+                                   handler: self.markFalseNegative)
+        alertController.addAction(action)
+        DispatchQueue.main.async {
+            self.present(alertController,
+                         animated: true,
+                         completion: nil)
+            _ = Timer.scheduledTimer(timeInterval: 20.0,
+                                     target: self,
+                                     selector: #selector(self.markInDanger),
+                                     userInfo: nil,
+                                     repeats: false)
+        }
+        return inDanger
+    }
+    
+    func markFalseNegative(alert: UIAlertAction!) {
         inDanger = false
     }
     
-    func timer2Action(){
-        if(inDanger==true){
-            let json: [String: Any] = ["master-kill": "master-kill"]
-            self.makeRequest(message: json, suffix: "master-kill")
+    func markInDanger() {
+        inDanger = true
+    }
+    
+    
+    // ---------------------------------------------------------------------
+    // Kill/overdose
+    // ---------------------------------------------------------------------
+    
+    func triggerMasterKill(){
+        let json: [String: Any] = ["master-kill": "master-kill"]
+        HTTPRequests.postJSON(json: json, suffix: "master-kill")
+    }
+
+    
+    @IBAction func triggerSimulatedKill(_ sender: UIButton) {
+        if(monitoringActivated == true) {
+            triggerMasterKill()
+        } else {
+            monitoringActivated = false
         }
     }
     
-    func processOverdose(){
-        timer.invalidate()
+    
+    // ---------------------------------------------------------------------
+    // Stop monitoring
+    // ---------------------------------------------------------------------
+    
+    @IBAction func stopMonitoring(_ sender: UIButton) {
+        if (monitoringActivated == true) {
+            stopHeartRateTimer()
+            notifyServerStopMonitoring()
+            } else {
+            monitoringActivated = false
+        }
     }
+    
+    func stopHeartRateTimer(){
+        heartRateTimer.invalidate()
+    }
+    
+    func notifyServerStopMonitoring() {
+        let json: [String: Any] = ["stop": "stop"]
+        HTTPRequests.postJSON(json: json, suffix: "stop-app")
+    }
+
 }
 
